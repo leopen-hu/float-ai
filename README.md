@@ -1,54 +1,73 @@
-# React + TypeScript + Vite
+# Float AI Chrome Extension
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Chrome browser AI assistant extension that provides intelligent conversation services using the DeepSeek API.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Integration with DeepSeek API for intelligent conversations
+- Support for streaming responses, displaying AI replies in real-time
+- Clean sidebar interface
+- Configurable API key and model selection
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 19
+- TypeScript
+- Vite
+- Chrome Extension API
+- OpenAI SDK
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Development Requirements
+
+- Node.js
+- pnpm package manager
+- Chrome browser (version >= 80)
+
+## Installation
+
+1. Clone the project and install dependencies:
+
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Run in development mode:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+pnpm dev
 ```
+
+3. Build the extension:
+
+```bash
+pnpm build
+```
+
+## Using in Chrome
+
+1. Open Chrome browser and go to the extensions management page (chrome://extensions/)
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Select the project's dist directory
+
+## Configuration
+
+1. After installing the extension, click the extension icon
+2. Configure the DeepSeek API key in settings
+3. Optionally select the model to use (default is deepseek-chat)
+
+## Usage
+
+1. Click the extension icon in the browser toolbar to open the sidebar
+2. Enter your question in the chat box
+3. The AI assistant will return answers in real-time streaming
+
+## Development Guide
+
+- `src/background.ts`: Extension's background script, handles communication with DeepSeek API
+- `src/components/`: Contains all React components
+- `public/manifest.json`: Chrome extension configuration file
+
+## License
+
+MIT License
