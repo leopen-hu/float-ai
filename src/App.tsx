@@ -3,6 +3,7 @@ import "./App.css";
 import Sidebar from "./components/Sidebar";
 import { Message, StreamMessage } from "./types/message";
 import { MessageService } from "./services/messageService";
+import MessageList from "./components/MessageList";
 
 function App() {
   const [messages, setMessages] = useState<Array<Message>>([]);
@@ -11,18 +12,6 @@ function App() {
   const [apiKey, setApiKey] = useState("");
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
 
-  const toggleReasoning = (index: number) => {
-    setMessages((prevMessages) => {
-      const newMessages = [...prevMessages];
-      if (newMessages[index]) {
-        newMessages[index] = {
-          ...newMessages[index],
-          isReasoningCollapsed: !newMessages[index].isReasoningCollapsed,
-        };
-      }
-      return newMessages;
-    });
-  };
   // 初始化时从storage获取API密钥
   useEffect(() => {
     chrome.storage.local.get("apiKey").then((result) => {
@@ -114,34 +103,7 @@ function App() {
             )}
           </div>
         </div>
-        <div className="messages-container">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`message ${
-                message.isUser ? "user-message" : "ai-message"
-              }`}>
-              {model === "deepseek-reasoner" && message.reasoningContent && (
-                <>
-                  <span
-                    className="toggle-reasoning"
-                    onClick={() => toggleReasoning(index)}>
-                    {message.isReasoningCollapsed
-                      ? "显示推理过程"
-                      : "隐藏推理过程"}
-                  </span>
-                  <div
-                    className={`reasoning-content ${
-                      message.isReasoningCollapsed ? "collapsed" : ""
-                    }`}>
-                    {message.reasoningContent}
-                  </div>
-                </>
-              )}
-              {message.content}
-            </div>
-          ))}
-        </div>
+        <MessageList messages={messages} />
         <div className="input-container">
           <input
             type="text"
