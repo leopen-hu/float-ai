@@ -49,33 +49,19 @@ export class MessageService {
     model: string,
     updateMessages: (updater: (prevMessages: Message[]) => Message[]) => void
   ): void {
-    if (message.type === 'chat-stream') {
+    if (message.type === "chat-stream") {
       const { content, reasoning_content, done } = message.data;
       if (done) {
-        this.handleStreamComplete(updateMessages);
+        this.resetState();
       } else {
-        this.handleStreamUpdate(content, reasoning_content, model, updateMessages);
+        this.handleStreamUpdate(
+          content,
+          reasoning_content,
+          model,
+          updateMessages
+        );
       }
     }
-  }
-
-  private handleStreamComplete(
-    updateMessages: (updater: (prevMessages: Message[]) => Message[]) => void
-  ): void {
-    updateMessages(prevMessages => {
-      const newMessages = [...prevMessages];
-      if (this.isGenerating) {
-        newMessages.pop();
-      }
-      const newMessage: Message = {
-        content: this.currentStreamMessage,
-        reasoningContent: this.currentReasoningContent || null,
-        isReasoningCollapsed: false,
-        isUser: false
-      };
-      return [...newMessages, newMessage];
-    });
-    this.resetState();
   }
 
   private handleStreamUpdate(
