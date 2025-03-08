@@ -1,22 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "AI Chat Assistant",
+  "name": "Float AI",
   "version": "1.0.0",
-  "description": "一个智能的AI聊天助手浏览器插件",
+  "description": "An AI-powered tool that enhances your browsing experience.",
   "action": {
-    "default_title": "AI Chat Assistant",
+    "default_title": "Float AI",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
   },
-  "permissions": [
-    "storage",
-    "activeTab",
-    "sidePanel",
-    "runtime"
-  ],
+  "permissions": ["storage", "activeTab", "sidePanel", "runtime"],
   "side_panel": {
     "default_path": "index.html"
   },
