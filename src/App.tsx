@@ -13,6 +13,7 @@ function App() {
   const [model, setModel] = useState("deepseek-chat");
   const [apiKey, setApiKey] = useState("");
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState("zh");
   const i18nService = useMemo(() => I18nService.getInstance(), []);
   const { t } = useTranslation();
 
@@ -92,8 +93,11 @@ function App() {
           </div>
           <div className="language-selector">
             <select
-              value={i18nService.getCurrentLanguage()}
-              onChange={(e) => i18nService.changeLanguage(e.target.value)}
+              value={currentLanguage}
+              onChange={(e) => {
+                setCurrentLanguage(e.target.value);
+                i18nService.changeLanguage(e.target.value);
+              }}
               className="language-select">
               <option value="zh">中文</option>
               <option value="en">English</option>
