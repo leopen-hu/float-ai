@@ -17,13 +17,14 @@ class FloatMenu {
     this.lastMouseUpTime = event.timeStamp;
     const selection = window.getSelection()?.toString()?.trim();
     console.log(selection);
-    // 未选中文本或选中文本为空或已经显示过菜单，隐藏菜单并重置选中文本
-    if (!selection || selection === "" || this.selectedText) {
+    // 如果文本选择为空或与上次相同，则隐藏菜单并重置文本选择
+    if (!selection || selection === "" || selection === this.selectedText) {
       this.menuUI.removeMenu();
       this.selectedText = "";
       return;
     }
 
+    this.menuUI.removeMenu();
     this.selectedText = selection;
     const menuElement = this.menuUI.createMenu(event);
     console.log(menuElement);
