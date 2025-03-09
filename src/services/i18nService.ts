@@ -33,8 +33,12 @@ export class I18nService {
   private initI18n(): void {
     i18n.use(initReactI18next).init({
       resources: {
-        en: enTranslations,
-        zh: zhTranslations,
+        en: {
+          translation: enTranslations
+        },
+        zh: {
+          translation: zhTranslations
+        }
       },
       lng: this.currentLanguage,
       fallbackLng: "zh",
