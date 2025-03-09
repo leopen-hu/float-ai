@@ -24,9 +24,16 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
-// 监听来自popup页面的消息
-chrome.runtime.onMessage.addListener((message: ChatMessage, _sender, sendResponse) => {
+// 监听来自popup页面和内容脚本的消息
+chrome.runtime.onMessage.addListener((message: ChatMessage, sender, sendResponse) => {
   if (message.type === 'chat') {
+    // 如果消息来自内容脚本，尝试打开侧边栏
+    if (sender.tab && sender.tab.id) {
+      chrome.sidePanel.open({ tabId: sender.tab.id }).catch(error => {
+        console.error('打开侧边栏失败:', error);
+      });
+    }
+    
     // 使用ApiService处理聊天消息
     ApiService.getInstance()
       .streamChatCompletion(message.content)
