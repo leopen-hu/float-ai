@@ -82,15 +82,6 @@ function App() {
     <Sidebar>
       <div className="chat-container">
         <div className="settings-container">
-          <div className="model-selector">
-            <select
-              value={model}
-              onChange={(e) => handleModelChange(e.target.value)}
-              className="model-select">
-              <option value="deepseek-chat">DeepSeek-V3</option>
-              <option value="deepseek-reasoner">DeepSeek-R1</option>
-            </select>
-          </div>
           <div className="language-selector">
             <select
               value={currentLanguage}
@@ -122,14 +113,38 @@ function App() {
         </div>
         <MessageList messages={messages} />
         <div className="input-container">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyUp={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder={t("Type your message here...")}
-          />
-          <button onClick={handleSendMessage}>{t("Send")}</button>
+          <div className="input-wrapper">
+            <div className="input-mirror">{inputValue + " "}</div>
+            <textarea
+              className="inputArea"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyUp={(e) =>
+                e.key === "Enter" &&
+                !e.shiftKey &&
+                inputValue.trim() &&
+                handleSendMessage()
+              }
+              placeholder={t("Type your message here...")}
+            />
+          </div>
+          <div className="input-controls">
+            <div className="model-selector">
+              <select
+                value={model}
+                onChange={(e) => handleModelChange(e.target.value)}
+                className="model-select">
+                <option value="deepseek-chat">DeepSeek-V3</option>
+                <option value="deepseek-reasoner">深度思考 (R1)</option>
+              </select>
+            </div>
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim()}
+              className={!inputValue.trim() ? "button-disabled" : ""}>
+              {t("Send")}
+            </button>
+          </div>
         </div>
       </div>
     </Sidebar>

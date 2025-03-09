@@ -69,9 +69,32 @@
 
 .input-container {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
   padding: 8px;
   border-top: 1px solid #e0e0e0;
+  background-color: #fff;
+  border-radius: 8px;
+  margin: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: sticky;
+  bottom: 0;
+}
+
+.model-selector {
+  min-width: 100px;
+  max-width: 150px;
+  position: relative;
+}
+
+.model-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-right: 1px solid #e0e0e0;
+  border-radius: 8px 0 0 8px;
+  outline: none;
+  background-color: transparent;
+  font-size: 14px;
 }
 
 .settings-container {
@@ -91,7 +114,7 @@
 .model-select {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: none;
   border-radius: 4px;
   outline: none;
 }
@@ -130,4 +153,74 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.button-disabled {
+  background-color: #cccccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+.input-wrapper {
+  position: relative;
+  width: calc(100% - 16px);
+  margin: 8px;
+  line-height: 18px;
+  max-height: 196px;
+}
+
+.input-mirror {
+  visibility: hidden;
+  overflow-wrap: break-word;
+  min-height: 2.5em;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: inherit;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.inputArea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background-color: transparent;
+  resize: none;
+  overflow-y: auto;
+  padding: 0;
+  font-family: inherit;
+  line-height: inherit;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.input-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.input-container button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.button-disabled {
+  background-color: #cccccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
 }
