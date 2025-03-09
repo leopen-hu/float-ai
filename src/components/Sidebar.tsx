@@ -8,6 +8,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   const [isResizing, setIsResizing] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(400);
+  const [activeMenu, setActiveMenu] = useState("chat");
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,11 +42,29 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
       ref={sidebarRef}
       style={{ width: `${sidebarWidth}px` }}
     >
+      <div className="sidebar-menu">
+        <div
+          className={`menu-item ${activeMenu === "chat" ? "active" : ""}`}
+          onClick={() => setActiveMenu("chat")}
+        >
+          <span className="menu-icon">💬</span>
+          <span className="menu-text">对话</span>
+        </div>
+        <div
+          className={`menu-item ${activeMenu === "settings" ? "active" : ""}`}
+          onClick={() => setActiveMenu("settings")}
+        >
+          <span className="menu-icon">⚙️</span>
+          <span className="menu-text">设置</span>
+        </div>
+      </div>
       <div
         className="resize-handle"
         onMouseDown={() => setIsResizing(true)}
       />
-      {children}
+      <div className="sidebar-content">
+        {children}
+      </div>
     </div>
   );
 };
