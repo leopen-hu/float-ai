@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "浮动AI",
+    "description": "扩展程序的名称"
+  },
+  "appDescription": {
+    "message": "一个帮助你完成日常任务的浮动AI助手",
+    "description": "扩展程序的描述"
+  }
+}

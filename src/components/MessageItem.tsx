@@ -9,6 +9,7 @@ import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
 import "./MessageItem.css";
+import { useTranslation } from "react-i18next";
 
 interface MessageItemProps {
   message: Message;
@@ -18,6 +19,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
   const [isReasoningCollapsed, setIsReasoningCollapsed] = useState(
     message.isReasoningCollapsed
   );
+  const { t } = useTranslation();
 
   const toggleReasoning = () => {
     setIsReasoningCollapsed(!isReasoningCollapsed);
@@ -29,7 +31,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
       {message.reasoningContent && (
         <>
           <span className="toggle-reasoning" onClick={toggleReasoning}>
-            {isReasoningCollapsed ? "显示推理过程" : "隐藏推理过程"}
+            {isReasoningCollapsed ? t("Show Reasoning") : t("Hide Reasoning")}
           </span>
           <div
             className={`reasoning-content ${

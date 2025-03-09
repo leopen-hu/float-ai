@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Sidebar from "./components/Sidebar";
 import { Message, StreamMessage } from "./types/message";
 import { MessageService } from "./services/messageService";
 import MessageList from "./components/MessageList";
+import { I18nService } from "./services/i18nService";
+import { useTranslation } from "react-i18next";
 
 function App() {
   const [messages, setMessages] = useState<Array<Message>>([]);
@@ -11,6 +13,8 @@ function App() {
   const [model, setModel] = useState("deepseek-chat");
   const [apiKey, setApiKey] = useState("");
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const i18nService = useMemo(() => I18nService.getInstance(), []);
+  const { t } = useTranslation();
 
   // 初始化时从storage获取API密钥
   useEffect(() => {
@@ -61,7 +65,7 @@ function App() {
   };
   const handleSaveApiKey = async () => {
     if (!apiKey.trim()) {
-      alert("请输入有效的API密钥");
+      alert(t("API Key is required"));
       return;
     }
 
@@ -70,7 +74,7 @@ function App() {
       setShowApiKeyInput(false);
     } catch (error) {
       console.error("保存API密钥失败:", error);
-      alert("保存API密钥失败，请重试");
+      alert(t("An error occurred"));
     }
   };
   return (
@@ -86,9 +90,18 @@ function App() {
               <option value="deepseek-reasoner">DeepSeek-R1</option>
             </select>
           </div>
+          <div className="language-selector">
+            <select
+              value={i18nService.getCurrentLanguage()}
+              onChange={(e) => i18nService.changeLanguage(e.target.value)}
+              className="language-select">
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
           <div className="api-key-config">
             <button onClick={() => setShowApiKeyInput(!showApiKeyInput)}>
-              {showApiKeyInput ? "取消" : "配置API密钥"}
+              {showApiKeyInput ? t("Cancel") : t("API Key")}
             </button>
             {showApiKeyInput && (
               <div className="api-key-input-container">
@@ -96,9 +109,9 @@ function App() {
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="请输入API密钥"
+                  placeholder={t("Type your message here...")}
                 />
-                <button onClick={handleSaveApiKey}>保存</button>
+                <button onClick={handleSaveApiKey}>{t("Save")}</button>
               </div>
             )}
           </div>
@@ -110,9 +123,9 @@ function App() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyUp={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="输入消息..."
+            placeholder={t("Type your message here...")}
           />
-          <button onClick={handleSendMessage}>发送</button>
+          <button onClick={handleSendMessage}>{t("Send")}</button>
         </div>
       </div>
     </Sidebar>

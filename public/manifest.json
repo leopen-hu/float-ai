@@ -11,6 +11,7 @@
       "128": "icons/icon128.png"
     }
   },
+  "default_locale": "zh",
   "permissions": ["storage", "activeTab", "sidePanel", "runtime"],
   "side_panel": {
     "default_path": "index.html"
