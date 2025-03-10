@@ -12,9 +12,9 @@
     }
   },
   "default_locale": "zh",
-  "permissions": ["storage", "activeTab", "sidePanel", "runtime"],
+  "permissions": ["storage", "activeTab", "sidePanel", "scripting"],
   "side_panel": {
-    "default_path": "index.html"
+    "default_path": "sidebar/index.html"
   },
   "background": {
     "service_worker": "background.js"
@@ -30,8 +30,10 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "web_accessible_resources": [{
-    "resources": ["icons/*.png"],
-    "matches": ["<all_urls>"]
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

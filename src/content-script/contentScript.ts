@@ -1,5 +1,5 @@
 // 监听文本选择事件并显示浮动菜单
-import { FloatMenuUI } from './ui/FloatMenuUI'
+import { FloatMenuUI } from './FloatMenuUI'
 
 class FloatMenu {
   private menuUI: FloatMenuUI

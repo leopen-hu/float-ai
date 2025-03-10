@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && pnpm move-index",
     "lint": "eslint .",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\"",
+    "move-index": "mv dist/src/sidebar/index.html dist/sidebar/index.html && rm -rf dist/src"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.1.6",
