@@ -8,6 +8,13 @@ import { I18nService } from './services/i18nService'
 import { useTranslation } from 'react-i18next'
 import { Button } from './components/ui/button'
 import { Send } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './components/ui/select'
 
 function App() {
   const [messages, setMessages] = useState<Array<Message>>([])
@@ -85,17 +92,21 @@ function App() {
       <div className="chat-container">
         <div className="settings-container">
           <div className="language-selector">
-            <select
+            <Select
               value={currentLanguage}
-              onChange={(e) => {
-                setCurrentLanguage(e.target.value)
-                i18nService.changeLanguage(e.target.value)
+              onValueChange={(value) => {
+                setCurrentLanguage(value)
+                i18nService.changeLanguage(value)
               }}
-              className="language-select"
             >
-              <option value="zh">中文</option>
-              <option value="en">English</option>
-            </select>
+              <SelectTrigger className="w-[100px]">
+                <SelectValue placeholder="选择语言" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="zh">中文</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="api-key-config">
             <Button
@@ -113,11 +124,7 @@ function App() {
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder={t('Type your message here...')}
                 />
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={handleSaveApiKey}
-                >
+                <Button variant="default" size="sm" onClick={handleSaveApiKey}>
                   {t('Save')}
                 </Button>
               </div>
@@ -143,14 +150,15 @@ function App() {
           </div>
           <div className="input-controls">
             <div className="model-selector">
-              <select
-                value={model}
-                onChange={(e) => handleModelChange(e.target.value)}
-                className="model-select"
-              >
-                <option value="deepseek-chat">DeepSeek-V3</option>
-                <option value="deepseek-reasoner">深度思考 (R1)</option>
-              </select>
+              <Select value={model} onValueChange={handleModelChange}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="选择模型" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="deepseek-chat">DeepSeek-V3</SelectItem>
+                  <SelectItem value="deepseek-reasoner">DeepSeek-R1</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button
               onClick={handleSendMessage}

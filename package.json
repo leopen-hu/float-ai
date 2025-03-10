@@ -9,6 +9,7 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\""
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@tailwindcss/vite": "^4.0.12",
     "class-variance-authority": "^0.7.1",
