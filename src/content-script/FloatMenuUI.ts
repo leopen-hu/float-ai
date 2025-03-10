@@ -1,12 +1,58 @@
-// 浮动菜单UI构建类
+import { computePosition, flip, shift, offset } from '@floating-ui/dom'
 
-export interface FloatMenuPosition {
-  x: number
-  y: number
+export interface MenuItem {
+  id: string
+  text: string
+  icon?: string
+  children?: MenuItem[]
+  onClick?: () => void
 }
 
 export class FloatMenuUI {
   private menuElement: HTMLElement | null = null
+  private activeSubMenu: HTMLElement | null = null
+  private menuItems: MenuItem[] = [
+    {
+      id: 'copy',
+      text: '复制到',
+      icon: chrome.runtime.getURL('icons/icon16.png'),
+      children: [
+        {
+          id: 'copy-sidebar',
+          text: '侧边栏',
+          onClick: () => console.log('Copy to Sidebar'),
+        },
+        {
+          id: 'copy-clipboard',
+          text: '剪贴板',
+          onClick: () => console.log('Copy to Clipboard'),
+        },
+      ],
+    },
+    {
+      id: 'translate',
+      text: '翻译',
+      icon: chrome.runtime.getURL('icons/icon16.png'),
+      onClick: () => console.log('Translate'),
+    },
+    {
+      id: 'search',
+      text: '搜索',
+      icon: chrome.runtime.getURL('icons/icon16.png'),
+      children: [
+        {
+          id: 'search-google',
+          text: 'Google',
+          onClick: () => console.log('Search Google'),
+        },
+        {
+          id: 'search-bing',
+          text: 'Bing',
+          onClick: () => console.log('Search Bing'),
+        },
+      ],
+    },
+  ]
 
   constructor() {
     this.createStyles()
@@ -15,17 +61,60 @@ export class FloatMenuUI {
   private createStyles(): void {
     const styleElement = document.createElement('style')
     styleElement.textContent = `
-    .float-ai-menu {
-      position: fixed;
-      zIndex: 2147483647;
-      display: flex;
-      visibility: visible;
-      backgroundColor: white;
-      borderRadius: 8px;
-      boxShadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      padding: 8px;
-      animation: float-ai-fade-in 0.2s ease-in-out;
-    }
+      .float-ai-menu {
+        position: fixed;
+        z-index: 2147483647;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        padding: 4px;
+        min-width: 120px;
+        animation: float-ai-fade-in 0.2s ease-in-out;
+      }
+
+      .float-ai-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .float-ai-menu-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .float-ai-menu-item:hover {
+        background-color: #f5f5f5;
+      }
+
+      .float-ai-menu-item img {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+      }
+
+      .float-ai-menu-item-text {
+        flex-grow: 1;
+      }
+
+      .float-ai-menu-item-arrow {
+        margin-left: 8px;
+      }
+
+      .float-ai-submenu {
+        position: absolute;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        padding: 4px;
+        min-width: 120px;
+        display: none;
+      }
+
       @keyframes float-ai-fade-in {
         from {
           opacity: 0;
@@ -41,76 +130,106 @@ export class FloatMenuUI {
   }
 
   public createMenu(event: MouseEvent): HTMLElement {
-    this.menuElement = document.createElement('ul')
+    this.menuElement = document.createElement('div')
     this.menuElement.className = 'float-ai-menu'
+
+    const ul = document.createElement('ul')
+    this.menuElement.appendChild(ul)
+
+    this.createMenuItems(ul, this.menuItems)
     this.setMenuPosition(event)
-    this.createMenuItems(this.menuElement)
 
     return this.menuElement
   }
 
-  private createMenuItems(parentNode: Node) {
-    const items = [
-      {
-        id: 1,
-        icon: chrome.runtime.getURL('icons/icon16.png'),
-        text: 'Copy to SideBar',
-        onClick: () => {
-          console.log('Copy to SideBar')
-        },
-      },
-      {
-        id: 2,
-        icon: chrome.runtime.getURL('icons/icon16.png'),
-        text: 'Copy to SideBar 2',
-        onClick: () => {
-          console.log('Copy to SideBar 2')
-        },
-      },
-      {
-        id: 3,
-        icon: chrome.runtime.getURL('icons/icon16.png'),
-        text: 'Copy to SideBar 3',
-        onClick: () => {
-          console.log('Copy to SideBar 3')
-        },
-      },
-    ]
-    items.map((item) => {
-      const { icon, text } = item
-      const menuItem = document.createElement('li')
-      menuItem.className = 'menu-item'
+  private createMenuItems(parentElement: HTMLElement, items: MenuItem[]): void {
+    items.forEach((item) => {
+      const li = document.createElement('li')
+      const menuItem = document.createElement('div')
+      menuItem.className = 'float-ai-menu-item'
 
-      const iconElement = document.createElement('img')
-      iconElement.src = icon
-      iconElement.style.width = '16px'
-      iconElement.style.height = '16px'
-      menuItem.appendChild(iconElement)
-      menuItem.title = text
-      parentNode.appendChild(menuItem)
+      if (item.icon) {
+        const icon = document.createElement('img')
+        icon.src = item.icon
+        menuItem.appendChild(icon)
+      }
+
+      const text = document.createElement('span')
+      text.className = 'float-ai-menu-item-text'
+      text.textContent = item.text
+      menuItem.appendChild(text)
+
+      if (item.children) {
+        const arrow = document.createElement('span')
+        arrow.className = 'float-ai-menu-item-arrow'
+        arrow.textContent = '▶'
+        menuItem.appendChild(arrow)
+
+        const subMenu = document.createElement('div')
+        subMenu.className = 'float-ai-submenu'
+        const subUl = document.createElement('ul')
+        subMenu.appendChild(subUl)
+        this.createMenuItems(subUl, item.children)
+        li.appendChild(subMenu)
+
+        menuItem.addEventListener('mouseenter', () => {
+          if (this.activeSubMenu && this.activeSubMenu !== subMenu) {
+            this.activeSubMenu.style.display = 'none'
+          }
+          this.activeSubMenu = subMenu
+          subMenu.style.display = 'block'
+          this.positionSubMenu(menuItem, subMenu)
+        })
+      } else if (item.onClick) {
+        menuItem.addEventListener('click', (e) => {
+          e.stopPropagation()
+          item.onClick!()
+          this.removeMenu()
+        })
+      }
+
+      li.appendChild(menuItem)
+      parentElement.appendChild(li)
     })
   }
 
-  private setMenuPosition(event: MouseEvent): void {
+  private async positionSubMenu(
+    parentItem: HTMLElement,
+    subMenu: HTMLElement,
+  ): Promise<void> {
+    const { x, y } = await computePosition(parentItem, subMenu, {
+      placement: 'right-start',
+      middleware: [offset(4), flip(), shift({ padding: 8 })],
+    })
+
+    Object.assign(subMenu.style, {
+      left: `${x}px`,
+      top: `${y}px`,
+    })
+  }
+
+  private async setMenuPosition(event: MouseEvent): Promise<void> {
     if (!this.menuElement) return
 
-    const { innerWidth } = window
-    const { innerHeight } = window
-    const menuWidth = 100 // 预估菜单宽度
-    const menuHeight = 40 // 预估菜单高度
-
-    let x = event.clientX
-    let y = event.clientY + 10
-
-    // 确保菜单不会超出右边界
-    if (x + menuWidth > innerWidth) {
-      x = innerWidth - menuWidth
+    const virtualElement = {
+      getBoundingClientRect() {
+        return {
+          x: event.clientX,
+          y: event.clientY,
+          width: 0,
+          height: 0,
+          top: event.clientY,
+          right: event.clientX,
+          bottom: event.clientY,
+          left: event.clientX,
+        }
+      },
     }
 
-    // 确保菜单不会超出底部边界
-    if (y + menuHeight > innerHeight) {
-      y = event.clientY - menuHeight - 10 // 在选区上方显示
-    }
+    const { x, y } = await computePosition(virtualElement, this.menuElement, {
+      placement: 'bottom-start',
+      middleware: [offset(4), flip(), shift({ padding: 8 })],
+    })
 
     Object.assign(this.menuElement.style, {
       left: `${x}px`,
@@ -120,9 +239,9 @@ export class FloatMenuUI {
 
   public removeMenu(): void {
     if (this.menuElement && this.menuElement.parentNode) {
-      console.log('removeMenu')
       this.menuElement.parentNode.removeChild(this.menuElement)
       this.menuElement = null
+      this.activeSubMenu = null
     }
   }
 }

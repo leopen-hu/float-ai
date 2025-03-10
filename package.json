@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc -b && vite build && pnpm move-index",
+    "build": "pnpm build:main && pnpm build:content",
+    "build:main": "tsc -b && vite build && pnpm move-index",
+    "build:content": "vite build -c vite.content.config.ts",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\"",
     "move-index": "mv dist/src/sidebar/index.html dist/sidebar/index.html && rm -rf dist/src"
@@ -35,6 +37,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@floating-ui/dom": "^1.6.13",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/chrome": "^0.0.308",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
@@ -46,6 +50,7 @@
     "globals": "^15.15.0",
     "katex": "^0.16.21",
     "prettier": "^3.5.3",
+    "svelte": "^5.22.6",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"

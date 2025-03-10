@@ -15,11 +15,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         sidebar: resolve(__dirname, 'src/sidebar/index.html'),
-        background: resolve(__dirname, 'src/workjs/background.ts'),
-        contentScript: resolve(
-          __dirname,
-          'src/content-script/contentScript.ts',
-        ),
       },
       output: {
         entryFileNames: (chunk) => {
