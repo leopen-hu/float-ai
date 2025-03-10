@@ -8,6 +8,7 @@ import { I18nService } from './services/i18nService'
 import { useTranslation } from 'react-i18next'
 import { Button } from './components/ui/button'
 import { Send } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   Select,
   SelectContent,
@@ -15,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './components/ui/select'
+import { Toaster } from './components/ui/sonner'
 
 function App() {
   const [messages, setMessages] = useState<Array<Message>>([])
@@ -61,7 +63,7 @@ function App() {
       await MessageService.getInstance().sendMessage(inputValue)
     } catch (error) {
       console.error('发送消息失败:', error)
-      alert('发送消息失败，请重试')
+      toast.error(t('发送消息失败，请重试'))
     }
   }
   const handleModelChange = async (newModel: string) => {
@@ -70,12 +72,12 @@ function App() {
       await chrome.storage.local.set({ model: newModel })
     } catch (error) {
       console.error('保存模型选择失败:', error)
-      alert('保存模型选择失败，请重试')
+      toast.error(t('保存模型选择失败，请重试'))
     }
   }
   const handleSaveApiKey = async () => {
     if (!apiKey.trim()) {
-      alert(t('API Key is required'))
+      toast.error(t('API Key is required'))
       return
     }
 
@@ -84,11 +86,12 @@ function App() {
       setShowApiKeyInput(false)
     } catch (error) {
       console.error('保存API密钥失败:', error)
-      alert(t('An error occurred'))
+      toast.error(t('An error occurred'))
     }
   }
   return (
     <Sidebar>
+      <Toaster position="top-right" richColors />
       <div className="chat-container">
         <div className="settings-container">
           <div className="language-selector">
