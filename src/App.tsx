@@ -1,85 +1,85 @@
-import { useEffect, useMemo, useState } from "react";
-import "./App.css";
-import Sidebar from "./components/Sidebar";
-import { Message, StreamMessage } from "./types/message";
-import { MessageService } from "./services/messageService";
-import MessageList from "./components/MessageList";
-import { I18nService } from "./services/i18nService";
-import { useTranslation } from "react-i18next";
+import { useEffect, useMemo, useState } from 'react'
+import './App.css'
+import Sidebar from './components/Sidebar'
+import { Message, StreamMessage } from './types/message'
+import { MessageService } from './services/messageService'
+import MessageList from './components/MessageList'
+import { I18nService } from './services/i18nService'
+import { useTranslation } from 'react-i18next'
 import { Button } from './components/ui/button'
 import { Send } from 'lucide-react'
 
 function App() {
-  const [messages, setMessages] = useState<Array<Message>>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [model, setModel] = useState("deepseek-chat");
-  const [apiKey, setApiKey] = useState("");
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState("zh");
-  const i18nService = useMemo(() => I18nService.getInstance(), []);
-  const { t } = useTranslation();
+  const [messages, setMessages] = useState<Array<Message>>([])
+  const [inputValue, setInputValue] = useState('')
+  const [model, setModel] = useState('deepseek-chat')
+  const [apiKey, setApiKey] = useState('')
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false)
+  const [currentLanguage, setCurrentLanguage] = useState('zh')
+  const i18nService = useMemo(() => I18nService.getInstance(), [])
+  const { t } = useTranslation()
 
   // 初始化时从storage获取API密钥
   useEffect(() => {
-    chrome.storage.local.get("apiKey").then((result) => {
+    chrome.storage.local.get('apiKey').then((result) => {
       if (result.apiKey) {
-        setApiKey(result.apiKey);
+        setApiKey(result.apiKey)
       }
-    });
+    })
 
     // 添加流式消息监听器
-    const messageService = MessageService.getInstance();
+    const messageService = MessageService.getInstance()
     const handleStreamMessage = (message: StreamMessage) => {
-      messageService.handleStreamMessage(message, model, setMessages);
-    };
+      messageService.handleStreamMessage(message, model, setMessages)
+    }
 
-    chrome.runtime.onMessage.addListener(handleStreamMessage);
+    chrome.runtime.onMessage.addListener(handleStreamMessage)
     return () => {
-      chrome.runtime.onMessage.removeListener(handleStreamMessage);
-    };
-  }, [model]);
+      chrome.runtime.onMessage.removeListener(handleStreamMessage)
+    }
+  }, [model])
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim()) return
 
     // 添加用户消息到消息列表
     setMessages([
       ...messages,
       { content: inputValue, isUser: true, isReasoningCollapsed: false },
-    ]);
-    setInputValue("");
+    ])
+    setInputValue('')
 
     try {
       // 使用MessageService发送消息
-      await MessageService.getInstance().sendMessage(inputValue);
+      await MessageService.getInstance().sendMessage(inputValue)
     } catch (error) {
-      console.error("发送消息失败:", error);
-      alert("发送消息失败，请重试");
+      console.error('发送消息失败:', error)
+      alert('发送消息失败，请重试')
     }
-  };
+  }
   const handleModelChange = async (newModel: string) => {
-    setModel(newModel);
+    setModel(newModel)
     try {
-      await chrome.storage.local.set({ model: newModel });
+      await chrome.storage.local.set({ model: newModel })
     } catch (error) {
-      console.error("保存模型选择失败:", error);
-      alert("保存模型选择失败，请重试");
+      console.error('保存模型选择失败:', error)
+      alert('保存模型选择失败，请重试')
     }
-  };
+  }
   const handleSaveApiKey = async () => {
     if (!apiKey.trim()) {
-      alert(t("API Key is required"));
-      return;
+      alert(t('API Key is required'))
+      return
     }
 
     try {
-      await chrome.storage.local.set({ apiKey });
-      setShowApiKeyInput(false);
+      await chrome.storage.local.set({ apiKey })
+      setShowApiKeyInput(false)
     } catch (error) {
-      console.error("保存API密钥失败:", error);
-      alert(t("An error occurred"));
+      console.error('保存API密钥失败:', error)
+      alert(t('An error occurred'))
     }
-  };
+  }
   return (
     <Sidebar>
       <div className="chat-container">
@@ -156,4 +156,4 @@ function App() {
   )
 }
 
-export default App;
+export default App

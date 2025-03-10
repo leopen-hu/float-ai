@@ -1,51 +1,51 @@
 // 监听文本选择事件并显示浮动菜单
-import { FloatMenuUI } from "./ui/FloatMenuUI";
+import { FloatMenuUI } from './ui/FloatMenuUI'
 
 class FloatMenu {
-  private menuUI: FloatMenuUI;
-  private selectedText: string = "";
-  private lastMouseUpTime: number = 0;
+  private menuUI: FloatMenuUI
+  private selectedText: string = ''
+  private lastMouseUpTime: number = 0
 
   constructor() {
-    this.menuUI = new FloatMenuUI();
+    this.menuUI = new FloatMenuUI()
     // 初始化事件监听
-    document.addEventListener("mouseup", this.handleTextSelection.bind(this));
-    document.addEventListener("click", this.handleDocumentClick.bind(this));
+    document.addEventListener('mouseup', this.handleTextSelection.bind(this))
+    document.addEventListener('click', this.handleDocumentClick.bind(this))
   }
 
   private handleTextSelection(event: MouseEvent): void {
-    this.lastMouseUpTime = event.timeStamp;
-    const selection = window.getSelection()?.toString()?.trim();
-    console.log(selection);
+    this.lastMouseUpTime = event.timeStamp
+    const selection = window.getSelection()?.toString()?.trim()
+    console.log(selection)
     // 如果文本选择为空或与上次相同，则隐藏菜单并重置文本选择
-    if (!selection || selection === "" || selection === this.selectedText) {
-      this.menuUI.removeMenu();
-      this.selectedText = "";
-      return;
+    if (!selection || selection === '' || selection === this.selectedText) {
+      this.menuUI.removeMenu()
+      this.selectedText = ''
+      return
     }
 
-    this.menuUI.removeMenu();
-    this.selectedText = selection;
-    const menuElement = this.menuUI.createMenu(event);
-    console.log(menuElement);
+    this.menuUI.removeMenu()
+    this.selectedText = selection
+    const menuElement = this.menuUI.createMenu(event)
+    console.log(menuElement)
 
     if (document.body) {
-      document.body.appendChild(menuElement);
+      document.body.appendChild(menuElement)
     } else {
-      console.error("Document body not found");
+      console.error('Document body not found')
     }
   }
 
   private handleDocumentClick(event: MouseEvent): void {
     // 如果点击事件是由mouseup事件触发的文本选择操作，不隐藏菜单
-    if (event.type === "click" && event.timeStamp - this.lastMouseUpTime < 50) {
-      return;
+    if (event.type === 'click' && event.timeStamp - this.lastMouseUpTime < 50) {
+      return
     }
     // 点击页面其他区域时隐藏菜单
-    const menuElement = document.querySelector(".float-ai-menu");
+    const menuElement = document.querySelector('.float-ai-menu')
     if (menuElement && !menuElement.contains(event.target as Node)) {
-      this.menuUI.removeMenu();
-      this.selectedText = "";
+      this.menuUI.removeMenu()
+      this.selectedText = ''
     }
   }
 
@@ -64,5 +64,5 @@ class FloatMenu {
 }
 
 // 初始化浮动菜单
-new FloatMenu();
+new FloatMenu()
 console.log('Hello, FloatMenu!')
