@@ -6,6 +6,8 @@ import { MessageService } from "./services/messageService";
 import MessageList from "./components/MessageList";
 import { I18nService } from "./services/i18nService";
 import { useTranslation } from "react-i18next";
+import { Button } from './components/ui/button'
+import { Send } from 'lucide-react'
 
 function App() {
   const [messages, setMessages] = useState<Array<Message>>([]);
@@ -86,17 +88,18 @@ function App() {
             <select
               value={currentLanguage}
               onChange={(e) => {
-                setCurrentLanguage(e.target.value);
-                i18nService.changeLanguage(e.target.value);
+                setCurrentLanguage(e.target.value)
+                i18nService.changeLanguage(e.target.value)
               }}
-              className="language-select">
+              className="language-select"
+            >
               <option value="zh">中文</option>
               <option value="en">English</option>
             </select>
           </div>
           <div className="api-key-config">
             <button onClick={() => setShowApiKeyInput(!showApiKeyInput)}>
-              {showApiKeyInput ? t("Cancel") : t("API Key")}
+              {showApiKeyInput ? t('Cancel') : t('API Key')}
             </button>
             {showApiKeyInput && (
               <div className="api-key-input-container">
@@ -104,9 +107,9 @@ function App() {
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder={t("Type your message here...")}
+                  placeholder={t('Type your message here...')}
                 />
-                <button onClick={handleSaveApiKey}>{t("Save")}</button>
+                <button onClick={handleSaveApiKey}>{t('Save')}</button>
               </div>
             )}
           </div>
@@ -114,18 +117,18 @@ function App() {
         <MessageList messages={messages} />
         <div className="input-container">
           <div className="input-wrapper">
-            <div className="input-mirror">{inputValue + " "}</div>
+            <div className="input-mirror">{inputValue + ' '}</div>
             <textarea
               className="inputArea"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyUp={(e) =>
-                e.key === "Enter" &&
+                e.key === 'Enter' &&
                 !e.shiftKey &&
                 inputValue.trim() &&
                 handleSendMessage()
               }
-              placeholder={t("Type your message here...")}
+              placeholder={t('Type your message here...')}
             />
           </div>
           <div className="input-controls">
@@ -133,22 +136,24 @@ function App() {
               <select
                 value={model}
                 onChange={(e) => handleModelChange(e.target.value)}
-                className="model-select">
+                className="model-select"
+              >
                 <option value="deepseek-chat">DeepSeek-V3</option>
                 <option value="deepseek-reasoner">深度思考 (R1)</option>
               </select>
             </div>
-            <button
+            <Button
               onClick={handleSendMessage}
               disabled={!inputValue.trim()}
-              className={!inputValue.trim() ? "button-disabled" : ""}>
-              {t("Send")}
-            </button>
+              className={!inputValue.trim() ? 'button-disabled' : ''}
+            >
+              <Send /> {t('Send')}
+            </Button>
           </div>
         </div>
       </div>
     </Sidebar>
-  );
+  )
 }
 
 export default App;
