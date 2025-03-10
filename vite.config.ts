@@ -14,7 +14,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'src/sidebar/index.html'),
+        sidebar: resolve(__dirname, 'src/sidebar/index.html'),
         background: resolve(__dirname, 'src/workjs/background.ts'),
         contentScript: resolve(
           __dirname,
@@ -23,12 +23,13 @@ export default defineConfig({
       },
       output: {
         entryFileNames: (chunk) => {
-          return chunk.name === 'main' ? 'assets/[name]-[hash].js' : '[name].js'
+          return chunk.name === 'sidebar'
+            ? 'sidebar/[name]-[hash].js'
+            : '[name].js'
         },
         chunkFileNames: '[name].js',
         assetFileNames: (assertInfo) => {
-          console.log('assertInfo', assertInfo.names.join('--'))
-          if (assertInfo.names.includes('main.css')) {
+          if (assertInfo.names.includes('sidebar.css')) {
             return 'sidebar/[name]-[hash][extname]'
           }
 
