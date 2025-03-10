@@ -98,9 +98,13 @@ function App() {
             </select>
           </div>
           <div className="api-key-config">
-            <button onClick={() => setShowApiKeyInput(!showApiKeyInput)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+            >
               {showApiKeyInput ? t('Cancel') : t('API Key')}
-            </button>
+            </Button>
             {showApiKeyInput && (
               <div className="api-key-input-container">
                 <input
@@ -109,7 +113,13 @@ function App() {
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder={t('Type your message here...')}
                 />
-                <button onClick={handleSaveApiKey}>{t('Save')}</button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleSaveApiKey}
+                >
+                  {t('Save')}
+                </Button>
               </div>
             )}
           </div>
