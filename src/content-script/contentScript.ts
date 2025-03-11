@@ -7,13 +7,11 @@ class FloatMenu {
   constructor() {
     this.menuUI = new FloatMenuUI()
     // 初始化事件监听
-    document.addEventListener(
-      'mouseup',
-      this.handleSelectionChange.bind(this),
-    )
+    document.addEventListener('mouseup', this.handleSelectionChange.bind(this))
   }
 
   private handleSelectionChange(): void {
+    console.log('handleSelectionChange')
     const selection = window.getSelection()?.toString()?.trim()
 
     // 如果文本选择为空或与上次相同，则隐藏菜单并重置文本选择
