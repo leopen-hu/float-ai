@@ -4,53 +4,48 @@ export interface MenuItem {
   id: string
   text: string
   icon?: string
-  children?: MenuItem[]
   onClick?: () => void
 }
 
 export class FloatMenuUI {
   private menuElement: HTMLElement | null = null
-  private activeSubMenu: HTMLElement | null = null
   private menuItems: MenuItem[] = [
     {
-      id: 'copy',
-      text: '复制到',
-      icon: chrome.runtime.getURL('icons/icon16.png'),
-      children: [
-        {
-          id: 'copy-sidebar',
-          text: '侧边栏',
-          onClick: () => console.log('Copy to Sidebar'),
-        },
-        {
-          id: 'copy-clipboard',
-          text: '剪贴板',
-          onClick: () => console.log('Copy to Clipboard'),
-        },
-      ],
+      id: 'copy-sidebar',
+      text: 'Copy to Sidebar',
+      onClick: () => console.log('Copy to Sidebar'),
+    },
+    {
+      id: 'copy-clipboard',
+      text: 'Copy to Clipboard',
+      onClick: () => console.log('Copy to Clipboard'),
     },
     {
       id: 'translate',
-      text: '翻译',
-      icon: chrome.runtime.getURL('icons/icon16.png'),
+      text: 'Translate to EN',
       onClick: () => console.log('Translate'),
     },
     {
-      id: 'search',
-      text: '搜索',
+      id: 'search-google',
+      text: 'Translate to ZH',
+      onClick: () => console.log('Search Google'),
+    },
+    {
+      id: 'search-bing',
+      text: 'Bing',
       icon: chrome.runtime.getURL('icons/icon16.png'),
-      children: [
-        {
-          id: 'search-google',
-          text: 'Google',
-          onClick: () => console.log('Search Google'),
-        },
-        {
-          id: 'search-bing',
-          text: 'Bing',
-          onClick: () => console.log('Search Bing'),
-        },
-      ],
+      onClick: () => console.log('Search Bing'),
+    },
+    {
+      id: 'search-google',
+      text: 'Google',
+      icon: chrome.runtime.getURL('icons/icon16.png'),
+      onClick: () => console.log('Search Bing'),
+    },
+    {
+      id: 'analyze',
+      text: 'Analysis with AI',
+      onClick: () => console.log('Search Bing'),
     },
   ]
 
@@ -68,11 +63,15 @@ export class FloatMenuUI {
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         padding: 4px;
-        min-width: 120px;
+        max-width: 360px;
         animation: float-ai-fade-in 0.2s ease-in-out;
+        font-size: 14px;
       }
 
       .float-ai-menu ul {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
         list-style: none;
         margin: 0;
         padding: 0;
@@ -81,38 +80,24 @@ export class FloatMenuUI {
       .float-ai-menu-item {
         display: flex;
         align-items: center;
-        padding: 8px 12px;
+        padding: 4px;
         cursor: pointer;
+        border: 1px solid #e0e0e0;
         border-radius: 4px;
-        position: relative;
+      }
+
+      .float-ai-menu-item img {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
       }
 
       .float-ai-menu-item:hover {
         background-color: #f5f5f5;
       }
 
-      .float-ai-menu-item img {
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
-      }
-
       .float-ai-menu-item-text {
         flex-grow: 1;
-      }
-
-      .float-ai-menu-item-arrow {
-        margin-left: 8px;
-      }
-
-      .float-ai-submenu {
-        position: absolute;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        padding: 4px;
-        min-width: 120px;
-        display: none;
       }
 
       @keyframes float-ai-fade-in {
@@ -159,28 +144,7 @@ export class FloatMenuUI {
       text.textContent = item.text
       menuItem.appendChild(text)
 
-      if (item.children) {
-        const arrow = document.createElement('span')
-        arrow.className = 'float-ai-menu-item-arrow'
-        arrow.textContent = '▶'
-        menuItem.appendChild(arrow)
-
-        const subMenu = document.createElement('div')
-        subMenu.className = 'float-ai-submenu'
-        const subUl = document.createElement('ul')
-        subMenu.appendChild(subUl)
-        this.createMenuItems(subUl, item.children)
-        li.appendChild(subMenu)
-
-        menuItem.addEventListener('mouseenter', () => {
-          if (this.activeSubMenu && this.activeSubMenu !== subMenu) {
-            this.activeSubMenu.style.display = 'none'
-          }
-          this.activeSubMenu = subMenu
-          subMenu.style.display = 'block'
-          this.positionSubMenu(menuItem, subMenu)
-        })
-      } else if (item.onClick) {
+      if (item.onClick) {
         menuItem.addEventListener('click', (e) => {
           e.stopPropagation()
           item.onClick!()
@@ -190,22 +154,6 @@ export class FloatMenuUI {
 
       li.appendChild(menuItem)
       parentElement.appendChild(li)
-    })
-  }
-
-  private async positionSubMenu(
-    parentItem: HTMLElement,
-    subMenu: HTMLElement,
-  ): Promise<void> {
-    const { x, y } = await computePosition(parentItem, subMenu, {
-      placement: 'right-start',
-      middleware: [offset(4), flip(), shift({ padding: 8 })],
-    })
-    console.log(x, y)
-
-    Object.assign(subMenu.style, {
-      left: `${x}px`,
-      top: `${y}px`,
     })
   }
 
@@ -252,7 +200,6 @@ export class FloatMenuUI {
     if (this.menuElement && this.menuElement.parentNode) {
       this.menuElement.parentNode.removeChild(this.menuElement)
       this.menuElement = null
-      this.activeSubMenu = null
     }
   }
 }
