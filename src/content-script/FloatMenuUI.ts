@@ -129,7 +129,7 @@ export class FloatMenuUI {
     document.head.appendChild(styleElement)
   }
 
-  public createMenu(event: MouseEvent): HTMLElement {
+  public createMenu(): HTMLElement {
     this.menuElement = document.createElement('div')
     this.menuElement.className = 'float-ai-menu'
 
@@ -137,7 +137,7 @@ export class FloatMenuUI {
     this.menuElement.appendChild(ul)
 
     this.createMenuItems(ul, this.menuItems)
-    this.setMenuPosition(event)
+    this.setMenuPosition()
 
     return this.menuElement
   }
@@ -201,6 +201,7 @@ export class FloatMenuUI {
       placement: 'right-start',
       middleware: [offset(4), flip(), shift({ padding: 8 })],
     })
+    console.log(x, y)
 
     Object.assign(subMenu.style, {
       left: `${x}px`,
@@ -208,28 +209,38 @@ export class FloatMenuUI {
     })
   }
 
-  private async setMenuPosition(event: MouseEvent): Promise<void> {
+  private async setMenuPosition(): Promise<void> {
     if (!this.menuElement) return
 
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    const range = selection.getRangeAt(0)
+    const rect = range.getBoundingClientRect()
+    const { left, right, bottom } = rect
     const virtualElement = {
       getBoundingClientRect() {
         return {
-          x: event.clientX,
-          y: event.clientY,
+          // fix: 单行文本过长时（比如有些 markdown code 不会换行）菜单位置远离
+          x: (right + left) / 2,
+          y: bottom,
           width: 0,
           height: 0,
-          top: event.clientY,
-          right: event.clientX,
-          bottom: event.clientY,
-          left: event.clientX,
+          top: bottom,
+          right: (right + left) / 2,
+          bottom: bottom,
+          left: (right + left) / 2,
         }
       },
     }
 
     const { x, y } = await computePosition(virtualElement, this.menuElement, {
+      strategy: 'fixed',
       placement: 'bottom-start',
       middleware: [offset(4), flip(), shift({ padding: 8 })],
     })
+    console.log(right, bottom)
+    console.log(x, y)
 
     Object.assign(this.menuElement.style, {
       left: `${x}px`,

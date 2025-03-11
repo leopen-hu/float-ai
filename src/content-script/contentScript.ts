@@ -27,15 +27,15 @@ class FloatMenu {
     const range = window.getSelection()?.getRangeAt(0)
     if (!range) return
 
-    const rect = range.getBoundingClientRect()
-    const event = new MouseEvent('mouseup', {
-      clientX: rect.right,
-      clientY: rect.bottom,
-    })
+    // const rect = range.getBoundingClientRect()
+    // const event = new MouseEvent('mouseup', {
+    //   clientX: rect.right,
+    //   clientY: rect.bottom,
+    // })
 
     this.menuUI.removeMenu()
     this.selectedText = selection
-    const menuElement = this.menuUI.createMenu(event)
+    const menuElement = this.menuUI.createMenu()
 
     if (document.body) {
       document.body.appendChild(menuElement)
