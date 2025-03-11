@@ -8,7 +8,6 @@ import { I18nService } from './services/i18nService'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/ui/button'
 import { Send } from 'lucide-react'
-import { toast } from 'sonner'
 import {
   Select,
   SelectContent,
@@ -17,6 +16,7 @@ import {
   SelectValue,
 } from '../components/ui/select'
 import { Toaster } from '../components/ui/sonner'
+import { toast } from 'sonner'
 
 function App() {
   const [messages, setMessages] = useState<Array<Message>>([])
