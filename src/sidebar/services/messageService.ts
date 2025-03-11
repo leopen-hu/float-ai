@@ -9,7 +9,7 @@ export interface Message {
 
 export type SendMessageResponse = {
   success: boolean
-  data?: { message: string }
+  data?: { content: string; reasoningContent: string }
   error?: string
 }
 
@@ -31,13 +31,35 @@ export class MessageService {
   public async sendMessage(content: string): Promise<void> {
     try {
       const response = await chrome.runtime.sendMessage<SendMessageResponse>({
-        type: 'chat',
+        type: 'stream',
         content: content,
       })
 
       if (!response.success) {
         throw new Error(response.error || '未知错误')
       }
+    } catch (error) {
+      console.error('发送消息失败:', error)
+      throw error
+    }
+  }
+
+  public async sendNonStreamMessage(
+    content: string,
+  ): Promise<{ content: string; reasoningContent: string }> {
+    try {
+      const response = await chrome.runtime.sendMessage<SendMessageResponse>({
+        type: 'not-stream',
+        content: content,
+      })
+      console.log('发送消息成功:', response)
+      if (!response.success) {
+        throw new Error(response.error || '未知错误')
+      }
+
+      return response.data
+        ? response.data
+        : { content: '', reasoningContent: '' }
     } catch (error) {
       console.error('发送消息失败:', error)
       throw error

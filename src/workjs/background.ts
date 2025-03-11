@@ -1,7 +1,7 @@
 import { ApiService } from './services/apiService'
 
 interface ChatMessage {
-  type: 'chat'
+  type: 'stream' | 'not-stream'
   content: string
 }
 
@@ -27,7 +27,20 @@ chrome.action.onClicked.addListener(async (tab) => {
 // 监听来自popup页面和内容脚本的消息
 chrome.runtime.onMessage.addListener(
   (message: ChatMessage, sender, sendResponse) => {
-    if (message.type === 'chat') {
+    console.log('收到来自popup页面的消息:', message)
+    if (message.type === 'not-stream') {
+      ApiService.getInstance()
+        .chatCompletion(message.content)
+        .then((response) => {
+          console.log('bg resp:', response)
+          sendResponse({ success: true, data: response })
+        })
+        .catch((error) => {
+          sendResponse({ success: false, error: error.message })
+        })
+      return true
+    }
+    if (message.type === 'stream') {
       // 如果消息来自内容脚本，尝试打开侧边栏
       if (sender.tab && sender.tab.id) {
         chrome.sidePanel.open({ tabId: sender.tab.id }).catch((error) => {

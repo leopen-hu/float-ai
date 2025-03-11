@@ -4,6 +4,10 @@ export interface ExtendedDelta extends OpenAI.ChatCompletionChunk.Choice.Delta {
   reasoning_content?: string
 }
 
+export interface ExtendedMessage extends OpenAI.Chat.ChatCompletionMessage {
+  reasoning_content?: string
+}
+
 export class ApiService {
   private static instance: ApiService
   private openai: OpenAI | null = null
@@ -65,6 +69,37 @@ export class ApiService {
       }
 
       await this.sendStreamMessage('', '', true)
+    } catch (error) {
+      console.error('处理聊天消息时出错:', error)
+      throw error
+    }
+  }
+
+  public async chatCompletion(
+    content: string,
+  ): Promise<{ content: string; reasoningContent: string }> {
+    try {
+      const openai = await this.getOpenAIInstance()
+      const { model = 'deepseek-chat' } =
+        await chrome.storage.local.get('model')
+
+      console.log('start net req')
+      const completion = await openai.chat.completions.create({
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: content },
+        ],
+        model: model,
+        stream: false,
+      })
+
+      const responseContent = completion.choices[0]?.message?.content || ''
+      const reasoningContent =
+        (completion.choices[0]?.message as ExtendedMessage)
+          ?.reasoning_content || ''
+
+      console.log('end net req', { responseContent, reasoningContent })
+      return { content: responseContent, reasoningContent }
     } catch (error) {
       console.error('处理聊天消息时出错:', error)
       throw error

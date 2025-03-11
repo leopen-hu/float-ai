@@ -26,7 +26,27 @@ function App() {
   const [showApiKeyInput, setShowApiKeyInput] = useState(false)
   const [currentLanguage, setCurrentLanguage] = useState('zh')
   const i18nService = useMemo(() => I18nService.getInstance(), [])
+  const [useStreamChat, setUseStreamChat] = useState(true)
   const { t } = useTranslation()
+
+  useEffect(() => {
+    chrome.storage.local.get(['apiKey', 'useStreamChat']).then((result) => {
+      if (result.apiKey) {
+        setApiKey(result.apiKey)
+      }
+      setUseStreamChat(result.useStreamChat ?? true)
+    })
+  }, [model])
+
+  const handleStreamChatChange = async (checked: boolean) => {
+    setUseStreamChat(checked)
+    try {
+      await chrome.storage.local.set({ useStreamChat: checked })
+    } catch (error) {
+      console.error('保存流式对话设置失败:', error)
+      toast.error(t('保存设置失败，请重试'))
+    }
+  }
 
   // 初始化时从storage获取API密钥
   useEffect(() => {
@@ -59,8 +79,22 @@ function App() {
     setInputValue('')
 
     try {
-      // 使用MessageService发送消息
-      await MessageService.getInstance().sendMessage(inputValue)
+      // 根据useStreamChat状态决定使用流式对话还是普通对话
+      if (useStreamChat) {
+        await MessageService.getInstance().sendMessage(inputValue)
+      } else {
+        const response =
+          await MessageService.getInstance().sendNonStreamMessage(inputValue)
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            content: response.content,
+            reasoningContent: response.reasoningContent,
+            isUser: false,
+            isReasoningCollapsed: false,
+          },
+        ])
+      }
     } catch (error) {
       console.error('发送消息失败:', error)
       toast.error(t('发送消息失败，请重试'))
@@ -162,6 +196,15 @@ function App() {
                   <SelectItem value="deepseek-reasoner">DeepSeek-R1</SelectItem>
                 </SelectContent>
               </Select>
+              <div className="stream-chat-toggle">
+                <input
+                  type="checkbox"
+                  id="streamChat"
+                  checked={useStreamChat}
+                  onChange={(e) => handleStreamChatChange(e.target.checked)}
+                />
+                <label htmlFor="streamChat">{t('流式对话')}</label>
+              </div>
             </div>
             <Button
               onClick={handleSendMessage}
