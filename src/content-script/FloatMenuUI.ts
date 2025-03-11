@@ -67,6 +67,8 @@ export class FloatMenuUI {
         width: 360px;
         animation: float-ai-fade-in 0.2s ease-in-out;
         font-size: 14px;
+        user-select: none;
+        pointer-events: auto;
       }
 
       .float-ai-menu ul {
@@ -130,6 +132,22 @@ export class FloatMenuUI {
         padding: 8px;
         font-size: 14px;
         color: #333;
+        position: relative;
+      }
+
+      .float-ai-menu-result-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+      }
+
+      .float-ai-menu-result-copy:hover {
+        opacity: 1;
       }
 
       .float-ai-menu-loading {
@@ -327,6 +345,26 @@ export class FloatMenuUI {
     const resultElement = document.createElement('div')
     resultElement.className = 'float-ai-menu-result'
     resultElement.textContent = message
+
+    const copyButton = document.createElement('img')
+    copyButton.className = 'float-ai-menu-result-copy'
+    copyButton.src = chrome.runtime.getURL('icons/copy.png')
+    copyButton.title = 'copy'
+    copyButton.addEventListener('click', () => {
+      navigator.clipboard
+        .writeText(message)
+        .then(() => {
+          copyButton.src = chrome.runtime.getURL('icons/copyed.png')
+          setTimeout(() => {
+            copyButton.src = chrome.runtime.getURL('icons/copy.png')
+          }, 2000)
+        })
+        .catch((err) => {
+          console.error('复制失败:', err)
+        })
+    })
+    resultElement.appendChild(copyButton)
+
     this.appendResult(resultElement)
   }
 
