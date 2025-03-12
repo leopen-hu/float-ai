@@ -1,9 +1,5 @@
 import { ApiService } from './services/apiService'
-
-interface ChatMessage {
-  type: 'stream' | 'not-stream'
-  content: string
-}
+import { promptService } from './services/promptService'
 
 // 在扩展安装或更新时初始化
 chrome.runtime.onInstalled.addListener(() => {
@@ -25,39 +21,69 @@ chrome.action.onClicked.addListener(async (tab) => {
 })
 
 // 监听来自popup页面和内容脚本的消息
-chrome.runtime.onMessage.addListener(
-  (message: ChatMessage, sender, sendResponse) => {
-    console.log('收到来自popup页面的消息:', message)
-    if (message.type === 'not-stream') {
-      ApiService.getInstance()
-        .chatCompletion(message.content)
-        .then((response) => {
-          console.log('bg resp:', response)
-          sendResponse({ success: true, data: response })
-        })
-        .catch((error) => {
-          sendResponse({ success: false, error: error.message })
-        })
-      return true
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'not-stream') {
+    ApiService.getInstance()
+      .chatCompletion(message.content)
+      .then((response) => {
+        console.log('bg resp:', response)
+        sendResponse({ success: true, data: response })
+      })
+      .catch((error) => {
+        sendResponse({ success: false, error: error.message })
+      })
+    return true
+  }
+  if (message.type === 'stream') {
+    // 如果消息来自内容脚本，尝试打开侧边栏
+    if (sender.tab && sender.tab.id) {
+      chrome.sidePanel.open({ tabId: sender.tab.id }).catch((error) => {
+        console.error('打开侧边栏失败:', error)
+      })
     }
-    if (message.type === 'stream') {
-      // 如果消息来自内容脚本，尝试打开侧边栏
-      if (sender.tab && sender.tab.id) {
-        chrome.sidePanel.open({ tabId: sender.tab.id }).catch((error) => {
-          console.error('打开侧边栏失败:', error)
-        })
-      }
 
-      // 使用ApiService处理聊天消息
-      ApiService.getInstance()
-        .streamChatCompletion(message.content)
-        .then(() => {
-          sendResponse({ success: true })
-        })
-        .catch((error) => {
-          sendResponse({ success: false, error: error.message })
-        })
-      return true // 保持消息通道开启
-    }
-  },
-)
+    // 使用ApiService处理聊天消息
+    ApiService.getInstance()
+      .streamChatCompletion(message.content)
+      .then(() => {
+        sendResponse({ success: true })
+      })
+      .catch((error) => {
+        sendResponse({ success: false, error: error.message })
+      })
+    return true // 保持消息通道开启
+  }
+
+  // Handle prompt related messages
+  if (message.type === 'getPrompts') {
+    promptService
+      .getPrompts()
+      .then((prompts) => sendResponse({ success: true, data: prompts }))
+      .catch((error) => sendResponse({ success: false, error: error.message }))
+    return true
+  }
+
+  if (message.type === 'createPrompt') {
+    promptService
+      .createPrompt(message.data)
+      .then((prompt) => sendResponse({ success: true, data: prompt }))
+      .catch((error) => sendResponse({ success: false, error: error.message }))
+    return true
+  }
+
+  if (message.type === 'updatePrompt') {
+    promptService
+      .updatePrompt(message.data)
+      .then((prompt) => sendResponse({ success: true, data: prompt }))
+      .catch((error) => sendResponse({ success: false, error: error.message }))
+    return true
+  }
+
+  if (message.type === 'deletePrompt') {
+    promptService
+      .deletePrompt(message.data)
+      .then(() => sendResponse({ success: true }))
+      .catch((error) => sendResponse({ success: false, error: error.message }))
+    return true
+  }
+})

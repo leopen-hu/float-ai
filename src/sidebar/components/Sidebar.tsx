@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import './Sidebar.css'
 import ModelManager from './ModelManager'
+import PromptManager from './PromptManager'
 
 interface SidebarProps {
   children: React.ReactNode
@@ -14,6 +15,8 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
     switch (activeMenu) {
       case 'models':
         return <ModelManager />
+      case 'prompts':
+        return <PromptManager />
       case 'settings':
         return <div>设置页面</div>
       default:
@@ -44,6 +47,13 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
         >
           <span className="menu-icon">⚙️</span>
           <span className="menu-text">设置</span>
+        </div>
+        <div
+          className={`menu-item ${activeMenu === 'prompts' ? 'active' : ''}`}
+          onClick={() => setActiveMenu('prompts')}
+        >
+          <span className="menu-icon">📝</span>
+          <span className="menu-text">提示词</span>
         </div>
       </div>
       <div className="sidebar-content">{renderContent()}</div>
