@@ -36,7 +36,7 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
     try {
       const newPrompt = await promptService.createPrompt(editingPrompt)
       if (newPrompt) {
-        setPrompts([...prompts, newPrompt])
+        setPrompts([...prompts, { ...editingPrompt, ...newPrompt }])
         setIsEditing(false)
         setEditingPrompt({
           name: '',
@@ -92,7 +92,10 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
             placeholder="描述（可选）"
             value={editingPrompt.description}
             onChange={(e) =>
-              setEditingPrompt({ ...editingPrompt, description: e.target.value })
+              setEditingPrompt({
+                ...editingPrompt,
+                description: e.target.value,
+              })
             }
             className="w-full mb-2 p-2 border rounded"
           />
@@ -113,10 +116,7 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
             className="w-full mb-2 p-2 border rounded h-24"
           />
           <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsEditing(false)}
-            >
+            <Button variant="outline" onClick={() => setIsEditing(false)}>
               取消
             </Button>
             <Button onClick={handleCreatePrompt}>保存</Button>
