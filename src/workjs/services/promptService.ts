@@ -62,9 +62,15 @@ export class PromptService {
   async getPrompts(): Promise<Prompt[]> {
       try {
         const store = await this.getStore()
-        const request =await store.getAll()
-
-        return request.result as Prompt[]
+        return new Promise<Prompt[]>((resolve, reject) => {
+          const request = store.getAll()
+          request.onsuccess = () => {
+            resolve(request.result as Prompt[])
+          }
+          request.onerror = () => {
+            reject(new Error('获取提示词失败'))
+          }
+        })
       } catch (error) {
         throw new Error('getPrompts失败: ' + (error as Error).message)
       }
