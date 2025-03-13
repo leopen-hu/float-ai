@@ -1,25 +1,7 @@
-import { openDB, DBSchema } from 'idb'
-
-interface ModelDB extends DBSchema {
-  models: {
-    key: string
-    value: Model
-  }
-}
-
-interface Model {
-  id: string
-  name: string
-  apiKey: string
-  baseUrl?: string
-  modelId?: string
-}
+import { dbService, Model } from './dbService'
 
 class ModelService {
   private static instance: ModelService
-  private dbName = 'float-ai-db'
-  private dbVersion = 1
-
   private constructor() {}
 
   public static getInstance(): ModelService {
@@ -30,13 +12,7 @@ class ModelService {
   }
 
   private async getDB() {
-    return await openDB<ModelDB>(this.dbName, this.dbVersion, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('models')) {
-          db.createObjectStore('models', { keyPath: 'id' })
-        }
-      },
-    })
+    return await dbService.getDB()
   }
 
   public async getModels(): Promise<Model[]> {
