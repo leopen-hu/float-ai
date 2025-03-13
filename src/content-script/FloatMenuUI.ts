@@ -10,48 +10,40 @@ export interface MenuItem {
 export class FloatMenuUI {
   private menuElement: HTMLElement | null = null
   private resultElement: HTMLElement | null = null
-  private menuItems: MenuItem[] = [
-    {
-      id: 'copy-sidebar',
-      text: 'Copy to Sidebar',
-      onClick: () => console.log('Copy to Sidebar'),
-    },
-    {
-      id: 'copy-clipboard',
-      text: 'Copy to Clipboard',
-      onClick: () => console.log('Copy to Clipboard'),
-    },
-    {
-      id: 'translate',
-      text: 'Translate to EN',
-      onClick: () => console.log('Translate'),
-    },
-    {
-      id: 'search-google',
-      text: 'Translate to ZH',
-      onClick: () => console.log('Search Google'),
-    },
-    {
-      id: 'search-bing',
-      text: 'Bing',
-      icon: chrome.runtime.getURL('icons/icon16.png'),
-      onClick: () => console.log('Search Bing'),
-    },
-    {
-      id: 'search-google',
-      text: 'Google',
-      icon: chrome.runtime.getURL('icons/icon16.png'),
-      onClick: () => console.log('Search Bing'),
-    },
-    {
-      id: 'analyze',
-      text: 'Analysis with AI',
-      onClick: () => console.log('Search Bing'),
-    },
-  ]
+  private menuItems: MenuItem[] = []
 
   constructor() {
     this.createStyles()
+    this.loadPromptMenuItems()
+  }
+
+  private async loadPromptMenuItems() {
+    try {
+      const prompts = await promptService.getPrompts()
+      this.menuItems = prompts.map(prompt => ({
+        id: prompt.id,
+        text: prompt.name,
+        onClick: () => {
+          // 处理提示词的应用逻辑
+          console.log('应用提示词:', prompt)
+        }
+      }))
+      // 添加其他固定的菜单项
+      this.menuItems.push(
+        {
+          id: 'copy-clipboard',
+          text: 'Copy to Clipboard',
+          onClick: () => console.log('Copy to Clipboard')
+        },
+        {
+          id: 'translate',
+          text: 'Translate',
+          onClick: () => console.log('Translate')
+        }
+      )
+    } catch (error) {
+      console.error('加载提示词失败:', error)
+    }
   }
 
   private createStyles(): void {
@@ -417,3 +409,4 @@ export class FloatMenuUI {
     }
   }
 }
+import { promptService } from '../sidebar/services/promptService'
