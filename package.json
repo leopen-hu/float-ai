@@ -12,12 +12,15 @@
     "move-index": "mv dist/src/sidebar/index.html dist/sidebar/index.html && rm -rf dist/src"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@tailwindcss/vite": "^4.0.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "i18next": "^24.2.2",
+    "idb": "^8.0.2",
     "lucide-react": "^0.479.0",
     "next-themes": "^0.4.5",
     "openai": "^4.86.2",
