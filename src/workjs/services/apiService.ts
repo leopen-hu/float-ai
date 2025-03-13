@@ -83,7 +83,6 @@ export class ApiService {
       const { model = 'deepseek-chat' } =
         await chrome.storage.local.get('model')
 
-      console.log('start net req')
       const completion = await openai.chat.completions.create({
         messages: [
           { role: 'system', content: 'You are a helpful assistant.' },
@@ -98,7 +97,6 @@ export class ApiService {
         (completion.choices[0]?.message as ExtendedMessage)
           ?.reasoning_content || ''
 
-      console.log('end net req', { responseContent, reasoningContent })
       return { content: responseContent, reasoningContent }
     } catch (error) {
       console.error('处理聊天消息时出错:', error)

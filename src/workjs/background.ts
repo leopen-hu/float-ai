@@ -8,12 +8,9 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // 监听扩展图标点击事件
 chrome.action.onClicked.addListener(async (tab) => {
-  console.log('扩展图标被点击')
   try {
-    console.log('尝试打开侧边栏')
     if (tab.id) {
       await chrome.sidePanel.open({ tabId: tab.id })
-      console.log('侧边栏打开成功')
     }
   } catch (error) {
     console.error('执行过程中出错:', error)
@@ -26,7 +23,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     ApiService.getInstance()
       .chatCompletion(message.content)
       .then((response) => {
-        console.log('bg resp:', response)
         sendResponse({ success: true, data: response })
       })
       .catch((error) => {
@@ -58,16 +54,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'getPrompts') {
     promptService
       .getPrompts()
-      .then((prompts) => sendResponse({ success: true, data: prompts }))
-      .catch((error) => sendResponse({ success: false, error: error.message }))
+      .then((prompts) => {
+        sendResponse({ success: true, data: prompts })
+      })
+      .catch((error) => {
+        sendResponse({ success: false, error: error.message })
+      })
     return true
   }
 
   if (message.type === 'createPrompt') {
     promptService
       .createPrompt(message.data)
-      .then((prompt) => sendResponse({ success: true, data: prompt }))
-      .catch((error) => sendResponse({ success: false, error: error.message }))
+      .then((prompt) => {
+        sendResponse({ success: true, data: prompt })
+      })
+      .catch((error) => {
+        sendResponse({ success: false, error: error.message })
+      })
     return true
   }
 

@@ -56,10 +56,8 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
     try {
       await promptService.deletePrompt(id)
       setPrompts(prompts.filter((p) => p.id !== id))
-      toast.success('删除提示词成功')
     } catch (error) {
       console.error('删除提示词失败:', error)
-      toast.error('删除提示词失败，请重试')
     }
   }
 

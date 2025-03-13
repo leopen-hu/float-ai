@@ -315,8 +315,6 @@ export class FloatMenuUI {
       placement: 'bottom-start',
       middleware: [offset(4), flip(), shift({ padding: 8 })],
     })
-    console.log(right, bottom)
-    console.log(x, y)
 
     Object.assign(this.menuElement.style, {
       left: `${x}px`,

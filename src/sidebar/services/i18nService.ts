@@ -54,8 +54,6 @@ export class I18nService {
       ns: ['translation'],
       defaultNS: 'translation',
     })
-
-    console.log('i18n初始化完成', i18n)
   }
 
   public async changeLanguage(language: string): Promise<void> {

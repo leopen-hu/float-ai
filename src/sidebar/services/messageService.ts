@@ -52,7 +52,6 @@ export class MessageService {
         type: 'not-stream',
         content: content,
       })
-      console.log('发送消息成功:', response)
       if (!response.success) {
         throw new Error(response.error || '未知错误')
       }
