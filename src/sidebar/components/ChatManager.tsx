@@ -5,32 +5,20 @@ import { MessageService } from '../services/messageService'
 import MessageList from './MessageList'
 import { Button } from '@/components/ui/button'
 import { Send } from 'lucide-react'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { toast } from 'sonner'
+import ModelSelector from './ModelSelector'
 
 const ChatManager = () => {
   const [messages, setMessages] = useState<Array<Message>>([])
   const [inputValue, setInputValue] = useState('')
-  const [model, setModel] = useState('deepseek-chat')
-  const [apiKey, setApiKey] = useState('')
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false)
   const [useStreamChat, setUseStreamChat] = useState(true)
   const { t } = useTranslation()
 
   useEffect(() => {
     chrome.storage.local.get(['apiKey', 'useStreamChat']).then((result) => {
-      if (result.apiKey) {
-        setApiKey(result.apiKey)
-      }
       setUseStreamChat(result.useStreamChat ?? true)
     })
-  }, [model])
+  }, [])
 
   const handleStreamChatChange = async (checked: boolean) => {
     setUseStreamChat(checked)
@@ -43,22 +31,16 @@ const ChatManager = () => {
   }
 
   useEffect(() => {
-    chrome.storage.local.get('apiKey').then((result) => {
-      if (result.apiKey) {
-        setApiKey(result.apiKey)
-      }
-    })
-
     const messageService = MessageService.getInstance()
     const handleStreamMessage = (message: StreamMessage) => {
-      messageService.handleStreamMessage(message, model, setMessages)
+      messageService.handleStreamMessage(message, setMessages)
     }
 
     chrome.runtime.onMessage.addListener(handleStreamMessage)
     return () => {
       chrome.runtime.onMessage.removeListener(handleStreamMessage)
     }
-  }, [model])
+  }, [])
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return
@@ -91,57 +73,9 @@ const ChatManager = () => {
     }
   }
 
-  const handleModelChange = async (newModel: string) => {
-    setModel(newModel)
-    try {
-      await chrome.storage.local.set({ model: newModel })
-    } catch (error) {
-      console.error('保存模型选择失败:', error)
-      toast.error(t('保存模型选择失败，请重试'))
-    }
-  }
-
-  const handleSaveApiKey = async () => {
-    if (!apiKey.trim()) {
-      toast.error(t('API Key is required'))
-      return
-    }
-
-    try {
-      await chrome.storage.local.set({ apiKey })
-      setShowApiKeyInput(false)
-    } catch (error) {
-      console.error('保存API密钥失败:', error)
-      toast.error(t('An error occurred'))
-    }
-  }
-
   return (
     <div className="chat-container">
-      <div className="settings-container">
-        <div className="api-key-config">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-          >
-            {showApiKeyInput ? t('Cancel') : t('API Key')}
-          </Button>
-          {showApiKeyInput && (
-            <div className="api-key-input-container">
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder={t('Type your message here...')}
-              />
-              <Button variant="default" size="sm" onClick={handleSaveApiKey}>
-                {t('Save')}
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+      <div className="settings-container"></div>
       <MessageList messages={messages} />
       <div className="input-container">
         <div className="input-wrapper">
@@ -161,15 +95,7 @@ const ChatManager = () => {
         </div>
         <div className="input-controls">
           <div className="model-selector">
-            <Select value={model} onValueChange={handleModelChange}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="选择模型" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="deepseek-chat">DeepSeek-V3</SelectItem>
-                <SelectItem value="deepseek-reasoner">DeepSeek-R1</SelectItem>
-              </SelectContent>
-            </Select>
+            <ModelSelector className="w-[150px]" />
             <div className="stream-chat-toggle">
               <input
                 type="checkbox"

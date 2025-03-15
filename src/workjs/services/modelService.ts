@@ -15,6 +15,17 @@ class ModelService {
     return await dbService.getDB()
   }
 
+  public async getModel(id: string): Promise<Model | undefined> {
+    console.log('id', id)
+    try {
+      const db = await this.getDB()
+      return await db.get('models', id)
+    } catch (error) {
+      console.error('获取模型失败:', error)
+      throw error
+    }
+  }
+
   public async getModels(): Promise<Model[]> {
     try {
       const db = await this.getDB()

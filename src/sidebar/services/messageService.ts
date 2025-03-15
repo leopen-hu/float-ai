@@ -67,7 +67,6 @@ export class MessageService {
 
   public handleStreamMessage(
     message: StreamMessage,
-    model: string,
     updateMessages: (updater: (prevMessages: Message[]) => Message[]) => void,
   ): void {
     if (message.type === 'chat-stream') {
@@ -75,12 +74,7 @@ export class MessageService {
       if (done) {
         this.resetState()
       } else {
-        this.handleStreamUpdate(
-          content,
-          reasoning_content,
-          model,
-          updateMessages,
-        )
+        this.handleStreamUpdate(content, reasoning_content, updateMessages)
       }
     }
   }
@@ -88,20 +82,16 @@ export class MessageService {
   private handleStreamUpdate(
     content: string,
     reasoningContent: string,
-    model: string,
     updateMessages: (updater: (prevMessages: Message[]) => Message[]) => void,
   ): void {
     this.currentStreamMessage += content
-    if (model === 'deepseek-reasoner') {
-      this.currentReasoningContent = reasoningContent
-    }
+    this.currentReasoningContent = reasoningContent
 
     updateMessages((prevMessages) => {
       const newMessages = [...prevMessages]
       const updatedMessage: Message = {
         content: this.currentStreamMessage,
-        reasoningContent:
-          model === 'deepseek-reasoner' ? this.currentReasoningContent : null,
+        reasoningContent: this.currentReasoningContent,
         isUser: false,
         isReasoningCollapsed: false,
       }

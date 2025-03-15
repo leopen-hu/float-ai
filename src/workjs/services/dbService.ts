@@ -15,8 +15,8 @@ export interface Model {
   id: string
   name: string
   apiKey: string
-  baseUrl?: string
-  modelId?: string
+  baseUrl: string
+  modelId: string
 }
 
 export interface Prompt {

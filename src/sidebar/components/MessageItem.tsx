@@ -25,6 +25,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     setIsReasoningCollapsed(!isReasoningCollapsed)
   }
 
+  console.log('MessageItem:', !!message.reasoningContent, !!message.content)
+
   return (
     <div
       className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}

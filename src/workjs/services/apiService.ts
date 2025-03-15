@@ -1,4 +1,5 @@
 import { OpenAI } from 'openai'
+import { modelService } from './modelService'
 
 export interface ExtendedDelta extends OpenAI.ChatCompletionChunk.Choice.Delta {
   reasoning_content?: string
@@ -8,9 +9,12 @@ export interface ExtendedMessage extends OpenAI.Chat.ChatCompletionMessage {
   reasoning_content?: string
 }
 
+export interface CurrentModel extends OpenAI {
+  modelId: string
+}
+
 export class ApiService {
   private static instance: ApiService
-  private openai: OpenAI | null = null
 
   private constructor() {}
 
@@ -21,38 +25,43 @@ export class ApiService {
     return ApiService.instance
   }
 
-  private async initializeOpenAI(): Promise<OpenAI> {
-    const { apiKey } = await chrome.storage.local.get('apiKey')
-
-    if (!apiKey) {
-      throw new Error('请先配置API密钥')
+  private async initCurrentModel(): Promise<CurrentModel> {
+    const { model: modelKey }: { model: string } =
+      await chrome.storage.local.get('model')
+    console.log('currentModelKey', modelKey)
+    if (!modelKey) {
+      throw new Error('未找到当前模型')
     }
 
-    return new OpenAI({
-      baseURL: 'https://api.deepseek.com',
-      apiKey: apiKey,
-    })
+    const currentModel = await modelService.getModel(modelKey)
+    if (!currentModel) {
+      throw new Error('模型在数据库中未找到')
+    }
+
+    return {
+      ...new OpenAI({
+        baseURL: currentModel.baseUrl,
+        apiKey: currentModel.apiKey,
+      }),
+      modelId: currentModel.modelId,
+    } as CurrentModel
   }
 
-  private async getOpenAIInstance(): Promise<OpenAI> {
-    if (!this.openai) {
-      this.openai = await this.initializeOpenAI()
-    }
-    return this.openai
+  private async getCurrentModel(): Promise<CurrentModel> {
+    // 实时获取当前模型，以避免配置变更后不生效
+    return await this.initCurrentModel()
   }
 
   public async streamChatCompletion(content: string): Promise<void> {
     try {
-      const openai = await this.getOpenAIInstance()
-      const { model = 'deepseek-chat' } =
-        await chrome.storage.local.get('model')
-
-      const completion = await openai.chat.completions.create({
+      const currentModel = await this.getCurrentModel()
+      const { modelId = 'deepseek-chat' } = currentModel
+      const completion = await currentModel.chat.completions.create({
         messages: [
           { role: 'system', content: 'You are a helpful assistant.' },
           { role: 'user', content: content },
         ],
-        model: model,
+        model: modelId,
         stream: true,
       })
 
@@ -65,6 +74,8 @@ export class ApiService {
           (chunk.choices[0]?.delta as ExtendedDelta)?.reasoning_content || ''
         reasoningContent += reasoning
 
+        console.log('content', content)
+        console.log('reasoningContent', reasoningContent)
         await this.sendStreamMessage(content, reasoningContent, false)
       }
 
@@ -79,16 +90,14 @@ export class ApiService {
     content: string,
   ): Promise<{ content: string; reasoningContent: string }> {
     try {
-      const openai = await this.getOpenAIInstance()
-      const { model = 'deepseek-chat' } =
-        await chrome.storage.local.get('model')
-
-      const completion = await openai.chat.completions.create({
+      const currentModel = await this.getCurrentModel()
+      const { modelId } = currentModel
+      const completion = await currentModel.chat.completions.create({
         messages: [
           { role: 'system', content: 'You are a helpful assistant.' },
           { role: 'user', content: content },
         ],
-        model: model,
+        model: modelId,
         stream: false,
       })
 
