@@ -189,7 +189,7 @@ const ModelManager = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">{t('Model Management')}</h2>
+        <h2 className="text-lg font-semibold">{t('Models')}</h2>
         <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
           {t('Add Model')}
         </Button>
