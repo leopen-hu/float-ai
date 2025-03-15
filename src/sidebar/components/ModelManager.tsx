@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,7 +41,6 @@ const ModelManager = () => {
     modelId: '',
   })
 
-
   useEffect(() => {
     const loadModels = async () => {
       try {
@@ -49,14 +49,12 @@ const ModelManager = () => {
       } catch (error) {
         console.error('加载模型列表失败:', error)
         toast.error(t('加载模型列表失败'), {
-          description: error instanceof Error ? error.message : '未知错误'
+          description: error instanceof Error ? error.message : '未知错误',
         })
       }
     }
     loadModels()
   }, [t])
-
-
 
   const handleSaveModel = async () => {
     if (!formData.name || !formData.apiKey) {
@@ -71,11 +69,13 @@ const ModelManager = () => {
         // 更新现有模型
         const updatedModel = await modelService.updateModel({
           ...editingModel,
-          ...formData
+          ...formData,
         })
-        setModels(models.map(model =>
-          model.id === updatedModel.id ? updatedModel : model
-        ))
+        setModels(
+          models.map((model) =>
+            model.id === updatedModel.id ? updatedModel : model,
+          ),
+        )
       } else {
         // 添加新模型
         const newModel = await modelService.createModel(formData)
@@ -199,9 +199,16 @@ const ModelManager = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
+            <DialogDescription />
             <DialogTitle>
               {editingModel ? t('编辑模型') : t('添加模型')}
             </DialogTitle>
+            <p
+              id="model-form-description"
+              className="text-sm text-muted-foreground"
+            >
+              {editingModel ? t('修改模型配置信息') : t('添加新的模型配置')}
+            </p>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
