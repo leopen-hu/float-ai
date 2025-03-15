@@ -4,12 +4,9 @@ import { MessageSquare, Bot, Settings, FileText } from 'lucide-react'
 import ModelManager from './ModelManager'
 import PromptManager from './PromptManager'
 import BottomControl from './BottomControl'
+import ChatManager from './ChatManager'
 
-interface SidebarProps {
-  children: React.ReactNode
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ children }) => {
+const Sidebar: React.FC = () => {
   const { t } = useTranslation()
   const [activeMenu, setActiveMenu] = useState('chat')
   const sidebarRef = useRef<HTMLDivElement>(null)
@@ -22,8 +19,10 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
         return <PromptManager />
       case 'settings':
         return <div>设置页面</div>
+      case 'chat':
+        return <ChatManager />
       default:
-        return children
+        return <ChatManager />
     }
   }
 

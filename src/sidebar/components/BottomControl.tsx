@@ -16,12 +16,16 @@ const BottomControl: React.FC = () => {
         defaultValue={i18nService.getCurrentLanguage()}
         onValueChange={(value) => i18nService.changeLanguage(value)}
       >
-        <SelectTrigger className="w-[60px] text-xs p-2 border-0 shadow-none focus-visible:bg-none focus-visible:ring-0 focus-visible:ring-offset-0">
+        <SelectTrigger className="w-[80px] justify-center gap-2 text-xs p-1 border-0 shadow-none focus-visible:bg-none focus-visible:ring-0 focus-visible:ring-offset-0">
           <SelectValue placeholder="选择语言" className=" text-xs" />
         </SelectTrigger>
         <SelectContent className=" text-xs">
-          <SelectItem value="zh" className="py-1">中文</SelectItem>
-          <SelectItem value="en" className="py-1">EN</SelectItem>
+          <SelectItem value="zh" className="py-1">
+            中文
+          </SelectItem>
+          <SelectItem value="en" className="py-1">
+            EN
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>
