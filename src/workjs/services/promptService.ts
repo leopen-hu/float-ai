@@ -22,6 +22,18 @@ class PromptService {
     return await dbService.getDB()
   }
 
+  public async getpromptById(id: string): Promise<Prompt | undefined> {
+    try {
+      console.log('getpromptById', id)
+      const db = await this.getDB()
+      const prompt = await db.get('prompts', id)
+      return prompt
+    } catch (error) {
+      console.error('PromptService: 获取提示词列表失败:', error)
+      throw error
+    }
+  }
+
   public async getPrompts(): Promise<Prompt[]> {
     try {
       const db = await this.getDB()

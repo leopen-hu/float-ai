@@ -24,8 +24,21 @@ export class FloatMenuUI {
         id: prompt.id,
         text: prompt.name,
         onClick: () => {
-          // 处理提示词的应用逻辑
-          console.log('应用提示词:', prompt)
+          const selectionText = window.getSelection()?.toString().trim() || ''
+          chrome.runtime.sendMessage(
+            {
+              action: 'execute-prompt',
+              content: selectionText,
+              promptId: prompt.id,
+            },
+            (response) => {
+              if (response?.error) {
+                this.showResult(`请求失败: ${response.error}`)
+              } else {
+                this.showResult(response.data.content)
+              }
+            },
+          )
         },
       }))
       // 添加其他固定的菜单项
@@ -244,9 +257,9 @@ export class FloatMenuUI {
 
           try {
             // 执行点击回调
-            await item.onClick!()
+            item.onClick!()
             // 显示结果
-            this.showResult('操作已完成')
+            // this.showResult('操作已完成')
           } catch (error: unknown) {
             this.showResult('操作失败：' + error)
           }
@@ -369,7 +382,6 @@ export class FloatMenuUI {
     if (!this.menuElement) return
 
     this.addDivider()
-
     this.resultElement = element
     this.menuElement.appendChild(element)
   }

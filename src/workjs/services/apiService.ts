@@ -1,5 +1,7 @@
 import { OpenAI } from 'openai'
 import { modelService } from './modelService'
+import { promptService } from './promptService'
+import { Prompt } from './dbService'
 
 export interface ExtendedDelta extends OpenAI.ChatCompletionChunk.Choice.Delta {
   reasoning_content?: string
@@ -13,8 +15,40 @@ export interface CurrentModel extends OpenAI {
   modelId: string
 }
 
+type ChatCompletionMessageParam =
+  OpenAI.Chat.Completions.ChatCompletionMessageParam
+
 export class ApiService {
   private static instance: ApiService
+
+  async createCompletionMessage(
+    content: string,
+    promptId?: string,
+  ): Promise<ChatCompletionMessageParam[]> {
+    try {
+      let prompt: Prompt | undefined = undefined
+      if (promptId) {
+        prompt = await promptService.getpromptById(promptId)
+      }
+      const messages: ChatCompletionMessageParam[] = [
+        {
+          role: 'system',
+          content: prompt?.systemRole
+            ? prompt.systemRole
+            : 'You are a helpful assistant.',
+        },
+        {
+          role: 'user',
+          content: prompt?.userRole
+            ? content?.replace(prompt.userRole, '{text}')
+            : content,
+        },
+      ]
+      return messages
+    } catch (error) {
+      throw new Error(`执行提示词失败:` + error)
+    }
+  }
 
   private constructor() {}
 
@@ -52,15 +86,15 @@ export class ApiService {
     return await this.initCurrentModel()
   }
 
-  public async streamChatCompletion(content: string): Promise<void> {
+  public async streamChatCompletion(
+    content: string,
+    promptId?: string,
+  ): Promise<void> {
     try {
       const currentModel = await this.getCurrentModel()
       const { modelId = 'deepseek-chat' } = currentModel
       const completion = await currentModel.chat.completions.create({
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: content },
-        ],
+        messages: await this.createCompletionMessage(content, promptId),
         model: modelId,
         stream: true,
       })
@@ -88,15 +122,14 @@ export class ApiService {
 
   public async chatCompletion(
     content: string,
+    promptId?: string,
   ): Promise<{ content: string; reasoningContent: string }> {
     try {
+      console.log('chatCompletion', content, promptId)
       const currentModel = await this.getCurrentModel()
       const { modelId } = currentModel
       const completion = await currentModel.chat.completions.create({
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: content },
-        ],
+        messages: await this.createCompletionMessage(content, promptId),
         model: modelId,
         stream: false,
       })

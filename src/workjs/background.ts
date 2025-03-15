@@ -19,6 +19,20 @@ chrome.action.onClicked.addListener(async (tab) => {
 
 // 监听来自popup页面和内容脚本的消息
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'execute-prompt') {
+    console.log('收到执行提示词的消息', message)
+    ApiService.getInstance()
+      .chatCompletion(message.content, message.promptId)
+      .then((response) => {
+        sendResponse({ success: true, data: response })
+      })
+      .catch((error) => {
+        sendResponse({ success: false, error: error.message })
+      })
+    return true
+  }
+
+  // Original listener handler
   if (message.type === 'not-stream') {
     ApiService.getInstance()
       .chatCompletion(message.content)
