@@ -70,8 +70,9 @@ const ModelManager = () => {
         setModels(models)
       } catch (error) {
         console.error('加载模型列表失败:', error)
-        toast.error(t('加载模型列表失败'), {
-          description: error instanceof Error ? error.message : '未知错误',
+        toast.error(t('Failed to load models'), {
+          description:
+            error instanceof Error ? error.message : t('Unknown error'),
         })
       }
     }
@@ -80,8 +81,8 @@ const ModelManager = () => {
 
   const handleSaveModel = async () => {
     if (!formData.name || !formData.apiKey) {
-      toast.error(t('请填写模型名称和API密钥'), {
-        description: t('这些字段是必需的'),
+      toast.error(t('Please fill in the model name and API key'), {
+        description: t('These fields are required'),
       })
       return
     }
@@ -106,16 +107,27 @@ const ModelManager = () => {
       setIsDialogOpen(false)
       resetForm()
 
-      toast.success(editingModel ? t('更新模型成功') : t('添加模型成功'), {
-        description: editingModel
-          ? t('模型信息已更新')
-          : t('新模型已添加到列表中'),
-      })
+      toast.success(
+        editingModel
+          ? t('Successfully updated model')
+          : t('Successfully created model'),
+        {
+          description: editingModel
+            ? t('Model information has been updated')
+            : t('New model has been added to the list'),
+        },
+      )
     } catch (error) {
       console.error(editingModel ? '更新模型失败:' : '添加模型失败:', error)
-      toast.error(editingModel ? t('更新模型失败') : t('添加模型失败'), {
-        description: error instanceof Error ? error.message : '未知错误',
-      })
+      toast.error(
+        editingModel
+          ? t('Failed to update model')
+          : t('Failed to create model'),
+        {
+          description:
+            error instanceof Error ? error.message : t('Unknown error'),
+        },
+      )
     }
   }
 
@@ -129,13 +141,14 @@ const ModelManager = () => {
     try {
       await modelService.deleteModel(deleteModelId)
       setModels(models.filter((model) => model.id !== deleteModelId))
-      toast.success(t('删除模型成功'), {
-        description: t('模型已从列表中移除'),
+      toast.success(t('Successfully deleted model'), {
+        description: t('Model has been removed from the list'),
       })
     } catch (error) {
       console.error('删除模型失败:', error)
-      toast.error(t('删除模型失败'), {
-        description: error instanceof Error ? error.message : '未知错误',
+      toast.error(t('Failed to delete model'), {
+        description:
+          error instanceof Error ? error.message : t('Unknown error'),
       })
     } finally {
       setDeleteModelId(null)
@@ -155,7 +168,7 @@ const ModelManager = () => {
 
   const handleCopyModel = (model: Model) => {
     setFormData({
-      name: `${model.name} (${t('复制')})`,
+      name: `${model.name} (${t('Copy')})`,
       apiKey: model.apiKey,
       baseUrl: model.baseUrl || '',
       modelId: model.modelId || '',
@@ -176,9 +189,9 @@ const ModelManager = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">{t('模型管理')}</h2>
+        <h2 className="text-lg font-semibold">{t('Model Management')}</h2>
         <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-          {t('添加模型')}
+          {t('Add Model')}
         </Button>
       </div>
 
@@ -188,15 +201,17 @@ const ModelManager = () => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('确认删除')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('Confirm Delete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('确定要删除这个模型吗？此操作无法撤销。')}
+              {t(
+                'Are you sure to delete this model? This action cannot be undone.',
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('取消')}</AlertDialogCancel>
+            <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>
-              {t('删除')}
+              {t('Delete Model')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

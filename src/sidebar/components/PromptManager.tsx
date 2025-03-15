@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -39,6 +40,7 @@ interface PromptManagerProps {
 }
 
 const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
+  const { t } = useTranslation()
   const handleCopyPrompt = (prompt: Prompt) => {
     setEditingPrompt({
       name: `${prompt.name} (复制)`,
@@ -63,18 +65,17 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
   })
 
   useEffect(() => {
-    loadPrompts()
-  }, [])
-
-  const loadPrompts = async () => {
-    try {
-      const data = await promptService.getPrompts()
-      setPrompts(data)
-    } catch (error) {
-      console.error('加载提示词失败:', error)
-      toast.error('加载提示词失败，请重试')
+    const loadPrompts = async () => {
+      try {
+        const data = await promptService.getPrompts()
+        setPrompts(data)
+      } catch (error) {
+        console.error('加载提示词失败:', error)
+        toast.error(t('Failed to load prompts'))
+      }
     }
-  }
+    loadPrompts()
+  }, [t])
 
   const handleSavePrompt = async () => {
     try {
@@ -88,14 +89,14 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
           setPrompts(
             prompts.map((p) => (p.id === updatedPrompt.id ? updatedPrompt : p)),
           )
-          toast.success('更新提示词成功')
+          toast.success(t('Successfully updated prompt'))
         }
       } else {
         // 创建新提示词
         const newPrompt = await promptService.createPrompt(editingPrompt)
         if (newPrompt) {
           setPrompts([...prompts, { ...editingPrompt, ...newPrompt }])
-          toast.success('创建提示词成功')
+          toast.success(t('Successfully created prompt'))
         }
       }
       setIsDialogOpen(false)
@@ -106,7 +107,9 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
         error,
       )
       toast.error(
-        editingPrompt.id ? '更新提示词失败，请重试' : '创建提示词失败，请重试',
+        editingPrompt.id
+          ? t('Failed to update prompt')
+          : t('Failed to create prompt'),
       )
     }
   }
@@ -121,10 +124,10 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
     try {
       await promptService.deletePrompt(deletePromptId)
       setPrompts(prompts.filter((p) => p.id !== deletePromptId))
-      toast.success('删除提示词成功')
+      toast.success(t('Successfully deleted prompt'))
     } catch (error) {
       console.error('删除提示词失败:', error)
-      toast.error('删除提示词失败，请重试')
+      toast.error(t('Failed to delete prompt'))
     } finally {
       setDeletePromptId(null)
     }
@@ -153,9 +156,9 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">提示词管理</h2>
+        <h2 className="text-lg font-semibold">{t('Prompt Management')}</h2>
         <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-          新建提示词
+          {t('Create Prompt')}
         </Button>
       </div>
 
@@ -165,14 +168,18 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogTitle>{t('Confirm Delete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              确定要删除这个提示词吗？此操作无法撤销。
+              {t(
+                'Are you sure to delete this prompt? This action cannot be undone.',
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>删除</AlertDialogAction>
+            <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              {t('Delete Prompt')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -182,18 +189,20 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
           <DialogHeader>
             <DialogDescription />
             <DialogTitle>
-              {editingPrompt.id ? '编辑提示词' : '新建提示词'}
+              {editingPrompt.id ? t('Edit Prompt') : t('Create Prompt')}
             </DialogTitle>
             <p
               id="prompt-form-description"
               className="text-sm text-muted-foreground"
             >
-              {editingPrompt.id ? '修改现有提示词配置' : '创建新的提示词配置'}
+              {editingPrompt.id
+                ? t('Modify existing prompt configuration')
+                : t('Create new prompt configuration')}
             </p>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">提示词名称</Label>
+              <Label htmlFor="name">{t('Prompt Name')}</Label>
               <Input
                 id="name"
                 value={editingPrompt.name}
@@ -203,7 +212,7 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="description">描述（可选）</Label>
+              <Label htmlFor="description">{t('Description (Optional)')}</Label>
               <Input
                 id="description"
                 value={editingPrompt.description}
@@ -216,7 +225,7 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="systemRole">System Role（可选）</Label>
+              <Label htmlFor="systemRole">{t('System Role (Optional)')}</Label>
               <Textarea
                 id="systemRole"
                 value={editingPrompt.systemRole}
@@ -230,7 +239,7 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="userRole">User Role（可选）</Label>
+              <Label htmlFor="userRole">{t('User Role (Optional)')}</Label>
               <Textarea
                 id="userRole"
                 value={editingPrompt.userRole}
@@ -246,10 +255,10 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              取消
+              {t('Cancel')}
             </Button>
             <Button onClick={handleSavePrompt}>
-              {editingPrompt.id ? '更新' : '保存'}
+              {editingPrompt.id ? t('Update') : t('Save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -313,14 +322,14 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          上一页
+          {t('Previous')}
         </Button>
         <Button
           variant="outline"
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage * itemsPerPage >= prompts.length}
         >
-          下一页
+          {t('Next')}
         </Button>
       </div>
     </div>
