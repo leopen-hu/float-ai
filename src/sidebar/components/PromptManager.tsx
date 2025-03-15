@@ -8,20 +8,51 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import type { Prompt, PromptCreateInput } from '../types/prompt'
 import { promptService } from '../services/promptService'
 import { toast } from 'sonner'
+import { Pencil, Trash2, Check, Copy } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 interface PromptManagerProps {
   onSelectPrompt?: (prompt: Prompt) => void
 }
 
 const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
+  const handleCopyPrompt = (prompt: Prompt) => {
+    setEditingPrompt({
+      name: `${prompt.name} (复制)`,
+      description: prompt.description || '',
+      systemRole: prompt.systemRole || '',
+      userRole: prompt.userRole || '',
+    })
+    setIsDialogOpen(true)
+  }
   const [prompts, setPrompts] = useState<Prompt[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+  const [deletePromptId, setDeletePromptId] = useState<string | null>(null)
   const [editingPrompt, setEditingPrompt] = useState<
     PromptCreateInput & { id?: string }
   >({
@@ -81,13 +112,21 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
   }
 
   const handleDeletePrompt = async (id: string) => {
+    setDeletePromptId(id)
+  }
+
+  const confirmDelete = async () => {
+    if (!deletePromptId) return
+
     try {
-      await promptService.deletePrompt(id)
-      setPrompts(prompts.filter((p) => p.id !== id))
+      await promptService.deletePrompt(deletePromptId)
+      setPrompts(prompts.filter((p) => p.id !== deletePromptId))
       toast.success('删除提示词成功')
     } catch (error) {
       console.error('删除提示词失败:', error)
       toast.error('删除提示词失败，请重试')
+    } finally {
+      setDeletePromptId(null)
     }
   }
 
@@ -119,6 +158,24 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
           新建提示词
         </Button>
       </div>
+
+      <AlertDialog
+        open={!!deletePromptId}
+        onOpenChange={(open) => !open && setDeletePromptId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>
+              确定要删除这个提示词吗？此操作无法撤销。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
@@ -198,47 +255,73 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
         </DialogContent>
       </Dialog>
 
-      <div className="space-y-4">
-        {prompts.map((prompt) => (
-          <div
-            key={prompt.id}
-            className="p-4 border rounded-lg hover:bg-accent"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <h3 className="font-medium">{prompt.name}</h3>
-                {prompt.description && (
-                  <p className="text-sm text-muted-foreground">
-                    {prompt.description}
-                  </p>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onSelectPrompt?.(prompt)}
-                >
-                  使用
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEditPrompt(prompt)}
-                >
-                  编辑
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeletePrompt(prompt.id)}
-                >
-                  删除
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>名称</TableHead>
+            <TableHead className="text-right">操作</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {prompts
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+            .map((prompt) => (
+              <TableRow key={prompt.id}>
+                <TableCell>{prompt.name}</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeletePrompt(prompt.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEditPrompt(prompt)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleCopyPrompt(prompt)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  {onSelectPrompt && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onSelectPrompt(prompt)}
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+      <div
+        className="flex justify-center mt-4 space-x-2"
+        hidden={prompts.length <= itemsPerPage}
+      >
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          上一页
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage * itemsPerPage >= prompts.length}
+        >
+          下一页
+        </Button>
       </div>
     </div>
   )

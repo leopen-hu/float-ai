@@ -20,26 +20,26 @@ export class FloatMenuUI {
   private async loadPromptMenuItems() {
     try {
       const prompts = await promptService.getPrompts()
-      this.menuItems = prompts.map(prompt => ({
+      this.menuItems = prompts.map((prompt) => ({
         id: prompt.id,
         text: prompt.name,
         onClick: () => {
           // 处理提示词的应用逻辑
           console.log('应用提示词:', prompt)
-        }
+        },
       }))
       // 添加其他固定的菜单项
       this.menuItems.push(
         {
           id: 'copy-clipboard',
           text: 'Copy to Clipboard',
-          onClick: () => console.log('Copy to Clipboard')
+          onClick: () => console.log('Copy to Clipboard'),
         },
         {
           id: 'translate',
           text: 'Translate',
-          onClick: () => console.log('Translate')
-        }
+          onClick: () => console.log('Translate'),
+        },
       )
     } catch (error) {
       console.error('加载提示词失败:', error)

@@ -1,4 +1,8 @@
-import type { Prompt, PromptCreateInput, PromptUpdateInput } from '../types/prompt'
+import type {
+  Prompt,
+  PromptCreateInput,
+  PromptUpdateInput,
+} from '../types/prompt'
 
 export type PromptResponse = {
   success: boolean
@@ -26,15 +30,15 @@ export class PromptService {
 
   async getPrompts(): Promise<Prompt[]> {
     const response: PromptsResponse = await chrome.runtime.sendMessage({
-      type: 'getPrompts'
+      type: 'getPrompts',
     })
     return response.data || []
   }
 
   async createPrompt(input: PromptCreateInput): Promise<Prompt | undefined> {
-    const response:PromptResponse = await chrome.runtime.sendMessage({
+    const response: PromptResponse = await chrome.runtime.sendMessage({
       type: 'createPrompt',
-      data: input
+      data: input,
     })
     if (!response.success) {
       throw new Error(response.error || '创建提示词失败')
@@ -45,7 +49,7 @@ export class PromptService {
   async updatePrompt(input: PromptUpdateInput): Promise<Prompt | undefined> {
     const response: PromptResponse = await chrome.runtime.sendMessage({
       type: 'updatePrompt',
-      data: input
+      data: input,
     })
     if (!response.success) {
       throw new Error(response.error || '更新提示词失败')
@@ -56,7 +60,7 @@ export class PromptService {
   async deletePrompt(id: string): Promise<boolean> {
     const response: PromptResponse = await chrome.runtime.sendMessage({
       type: 'deletePrompt',
-      data: id
+      data: id,
     })
     if (!response.success) {
       throw new Error(response.error || '删除提示词失败')

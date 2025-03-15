@@ -9,9 +9,28 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Pencil, Trash2, Copy } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { modelService } from '@/workjs/services/modelService'
 
 interface Model {
@@ -33,6 +52,9 @@ const ModelManager = () => {
   const { t } = useTranslation()
   const [models, setModels] = useState<Model[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+  const [deleteModelId, setDeleteModelId] = useState<string | null>(null)
   const [editingModel, setEditingModel] = useState<Model | null>(null)
   const [formData, setFormData] = useState<ModelFormData>({
     name: '',
@@ -98,9 +120,15 @@ const ModelManager = () => {
   }
 
   const handleDeleteModel = async (id: string) => {
+    setDeleteModelId(id)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteModelId) return
+
     try {
-      await modelService.deleteModel(id)
-      setModels(models.filter((model) => model.id !== id))
+      await modelService.deleteModel(deleteModelId)
+      setModels(models.filter((model) => model.id !== deleteModelId))
       toast.success(t('删除模型成功'), {
         description: t('模型已从列表中移除'),
       })
@@ -109,6 +137,8 @@ const ModelManager = () => {
       toast.error(t('删除模型失败'), {
         description: error instanceof Error ? error.message : '未知错误',
       })
+    } finally {
+      setDeleteModelId(null)
     }
   }
 
@@ -144,56 +174,94 @@ const ModelManager = () => {
   }
 
   return (
-    <div className="model-manager">
+    <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">{t('模型管理')}</h2>
-        <Button onClick={() => setIsDialogOpen(true)}>{t('添加模型')}</Button>
+        <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
+          {t('添加模型')}
+        </Button>
       </div>
 
-      <div className="model-list">
-        {models.map((model) => (
-          <div key={model.id} className="model-item">
-            <div className="model-info">
-              <h3>{model.name}</h3>
-              <p>
-                {t('API密钥')}: ****{model.apiKey.slice(-4)}
-              </p>
-              {model.baseUrl && (
-                <p>
-                  {t('基础URL')}: {model.baseUrl}
-                </p>
-              )}
-              {model.modelId && (
-                <p>
-                  {t('模型ID')}: {model.modelId}
-                </p>
-              )}
-            </div>
-            <div className="model-actions">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleDeleteModel(model.id)}
-              >
-                {t('删除')}
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleCopyModel(model)}
-              >
-                {t('复制')}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleEditModel(model)}
-              >
-                {t('编辑')}
-              </Button>
-            </div>
-          </div>
-        ))}
+      <AlertDialog
+        open={!!deleteModelId}
+        onOpenChange={(open) => !open && setDeleteModelId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('确认删除')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('确定要删除这个模型吗？此操作无法撤销。')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('取消')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              {t('删除')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t('名称')}</TableHead>
+            <TableHead>{t('模型ID')}</TableHead>
+            <TableHead className="text-right">{t('操作')}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {models
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+            .map((model) => (
+              <TableRow key={model.id}>
+                <TableCell>{model.name}</TableCell>
+                <TableCell>{model.modelId || '-'}</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteModel(model.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEditModel(model)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleCopyModel(model)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+      <div
+        className="flex justify-center mt-4 space-x-2"
+        hidden={models.length <= itemsPerPage}
+      >
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          {t('上一页')}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage * itemsPerPage >= models.length}
+        >
+          {t('下一页')}
+        </Button>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
