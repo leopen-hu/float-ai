@@ -1,4 +1,6 @@
 export const enTranslations = {
+  Name: 'Name',
+  Actions: 'Actions',
   'API Key': 'API Key',
   Save: 'Save',
   Cancel: 'Cancel',

@@ -220,9 +220,9 @@ const ModelManager = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('名称')}</TableHead>
-            <TableHead>{t('模型ID')}</TableHead>
-            <TableHead className="text-right">{t('操作')}</TableHead>
+            <TableHead>{t('Name')}</TableHead>
+            <TableHead>{t('Model ID')}</TableHead>
+            <TableHead className="text-right">{t('Actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

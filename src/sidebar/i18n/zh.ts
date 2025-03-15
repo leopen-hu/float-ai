@@ -1,4 +1,6 @@
 export const zhTranslations = {
+  Name: '名称',
+  Actions: '操作',
   'API Key': 'API密钥',
   Save: '保存',
   Cancel: '取消',

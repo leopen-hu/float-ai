@@ -267,8 +267,8 @@ const PromptManager: React.FC<PromptManagerProps> = ({ onSelectPrompt }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>名称</TableHead>
-            <TableHead className="text-right">操作</TableHead>
+            <TableHead>{t('Name')}</TableHead>
+            <TableHead className="text-right">{t('Actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
