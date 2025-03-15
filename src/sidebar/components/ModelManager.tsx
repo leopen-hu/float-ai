@@ -221,7 +221,6 @@ const ModelManager = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t('Name')}</TableHead>
-            <TableHead>{t('Model ID')}</TableHead>
             <TableHead className="text-right">{t('Actions')}</TableHead>
           </TableRow>
         </TableHeader>
@@ -231,7 +230,6 @@ const ModelManager = () => {
             .map((model) => (
               <TableRow key={model.id}>
                 <TableCell>{model.name}</TableCell>
-                <TableCell>{model.modelId || '-'}</TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button
                     variant="ghost"
