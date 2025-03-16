@@ -31,7 +31,6 @@ jobs:
 
     - name: Create release ZIP
       run: |
-        $version = ${env:GITHUB_REF_NAME}.Replace('v','')
         version=${GITHUB_REF_NAME#v}
         zip -r float-ai-v$version.zip dist/*
 
