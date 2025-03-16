@@ -1,0 +1,37 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build project
+      run: pnpm run build
+
+    - name: Create release ZIP
+      run: |
+        $version = ${env:GITHUB_REF_NAME}.Replace('v','')
+        version=${GITHUB_REF_NAME#v}
+        zip -r float-ai-v$version.zip dist/*
+
+    - name: Upload Release Asset
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: 'float-ai-*.zip'
+        token: ${{ secrets.GITHUB_TOKEN }}
