@@ -19,6 +19,10 @@ export const zhTranslations = {
   'Show Reasoning': '显示推理过程',
   'Hide Reasoning': '隐藏推理过程',
 
+  // 对话管理
+  'Chat Management': '对话管理',
+  'New Chat': '新对话',
+
   // 提示词管理
   'Prompt Management': '提示词管理',
   'Create Prompt': '新建提示词',

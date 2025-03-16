@@ -19,6 +19,10 @@ export const enTranslations = {
   'Show Reasoning': 'Show Reasoning',
   'Hide Reasoning': 'Hide Reasoning',
 
+  // Chat Management
+  'Chat Management': 'Chat Management',
+  'New Chat': 'New Chat',
+
   // Prompt Management
   'Prompt Management': 'Prompts',
   'Create Prompt': 'Create',

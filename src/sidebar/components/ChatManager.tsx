@@ -11,24 +11,7 @@ import ModelSelector from './ModelSelector'
 const ChatManager = () => {
   const [messages, setMessages] = useState<Array<Message>>([])
   const [inputValue, setInputValue] = useState('')
-  const [useStreamChat, setUseStreamChat] = useState(true)
   const { t } = useTranslation()
-
-  useEffect(() => {
-    chrome.storage.local.get(['apiKey', 'useStreamChat']).then((result) => {
-      setUseStreamChat(result.useStreamChat ?? true)
-    })
-  }, [])
-
-  const handleStreamChatChange = async (checked: boolean) => {
-    setUseStreamChat(checked)
-    try {
-      await chrome.storage.local.set({ useStreamChat: checked })
-    } catch (error) {
-      console.error('保存流式对话设置失败:', error)
-      toast.error(t('保存设置失败，请重试'))
-    }
-  }
 
   useEffect(() => {
     const messageService = MessageService.getInstance()
@@ -52,21 +35,7 @@ const ChatManager = () => {
     setInputValue('')
 
     try {
-      if (useStreamChat) {
-        await MessageService.getInstance().sendMessage(inputValue)
-      } else {
-        const response =
-          await MessageService.getInstance().sendNonStreamMessage(inputValue)
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            content: response.content,
-            reasoningContent: response.reasoningContent,
-            isUser: false,
-            isReasoningCollapsed: false,
-          },
-        ])
-      }
+      await MessageService.getInstance().sendMessage(inputValue)
     } catch (error) {
       console.error('发送消息失败:', error)
       toast.error(t('发送消息失败，请重试'))
@@ -74,14 +43,20 @@ const ChatManager = () => {
   }
 
   return (
-    <div className="chat-container">
-      <div className="settings-container"></div>
-      <MessageList messages={messages} />
-      <div className="input-container">
-        <div className="input-wrapper">
-          <div className="input-mirror">{inputValue + ' '}</div>
+    <div className="flex flex-col h-full bg-background">
+      <div className="flex-none p-4 border-b">
+        <h1 className="text-xl font-semibold">{t('New Chat')}</h1>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <MessageList messages={messages} />
+      </div>
+      <div className="flex-none p-4 border-t">
+        <div className="relative h-fit max-h-[250px] rounded-lg border bg-background shadow-sm">
+          <div className="inset-0 min-h-[100px] pointer-events-none opacity-0 p-2 break-words whitespace-break-spaces">
+            {inputValue + ' '}
+          </div>
           <textarea
-            className="inputArea"
+            className=" absolute bottom-0 left-0 right-0 top-0 p-2 break-words whitespace-break-spaces bg-transparent resize-none focus:outline-none"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyUp={(e) =>
@@ -93,25 +68,16 @@ const ChatManager = () => {
             placeholder={t('Type your message here...')}
           />
         </div>
-        <div className="input-controls">
-          <div className="model-selector">
+        <div className="flex items-center justify-between mt-4 space-x-4">
+          <div className="flex items-center space-x-4">
             <ModelSelector className="w-[150px]" />
-            <div className="stream-chat-toggle">
-              <input
-                type="checkbox"
-                id="streamChat"
-                checked={useStreamChat}
-                onChange={(e) => handleStreamChatChange(e.target.checked)}
-              />
-              <label htmlFor="streamChat">{t('流式对话')}</label>
-            </div>
           </div>
           <Button
             onClick={handleSendMessage}
             disabled={!inputValue.trim()}
-            className={!inputValue.trim() ? 'button-disabled' : ''}
+            className={`flex items-center space-x-2 ${!inputValue.trim() ? 'opacity-50' : ''}`}
           >
-            <Send /> {t('Send')}
+            <Send className="h-4 w-4" /> <span>{t('Send')}</span>
           </Button>
         </div>
       </div>
