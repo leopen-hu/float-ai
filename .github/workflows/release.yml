@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
@@ -39,3 +41,4 @@ jobs:
       with:
         artifacts: 'float-ai-*.zip'
         token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
