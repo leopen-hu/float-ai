@@ -1,3 +1,52 @@
+.message {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.user-message {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.ai-message {
+  background-color: white;
+  color: #333;
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+.ai-message .reasoning-content {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-left: 2px solid #ddd;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.ai-message .reasoning-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.ai-message .toggle-reasoning {
+  font-size: 0.8em;
+  color: #888;
+  cursor: pointer;
+  user-select: none;
+  display: block;
+  margin-bottom: 4px;
+}
+
 .markdown-body {
   code {
     padding: .2em .4em;
