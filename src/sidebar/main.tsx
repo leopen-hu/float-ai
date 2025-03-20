@@ -11,13 +11,14 @@ I18nService.getInstance()
 import { routeTree } from './routeTree.gen'
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router'
 
+// fix: cannot match '/' in extension environment
+// because default path is '/sidebar.html'
 const memoryHistory = createMemoryHistory({
-  initialEntries: ['/'], // Pass your initial url
+  initialEntries: ['/chats'],
 })
+
 // Create a new router instance
 const router = createRouter({ routeTree, history: memoryHistory })
-
-console.log(router)
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {

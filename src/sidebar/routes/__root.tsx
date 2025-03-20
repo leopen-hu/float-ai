@@ -86,9 +86,8 @@ function Sidebar() {
         <BottomControl />
       </div>
       <div className="flex-1 overflow-hidden p-4">
-        <Link to="/">Home</Link>
         <Outlet />
-        <TanStackRouterDevtoolsInProd  position='bottom-right' />
+        <TanStackRouterDevtoolsInProd position="bottom-right" />
       </div>
     </div>
   )

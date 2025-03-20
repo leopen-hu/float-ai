@@ -14,7 +14,6 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as PromptsImport } from './routes/prompts'
 import { Route as ModelsImport } from './routes/models'
 import { Route as ChatsImport } from './routes/chats'
-import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
 
@@ -36,23 +35,10 @@ const ChatsRoute = ChatsImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
     '/chats': {
       id: '/chats'
       path: '/chats'
@@ -80,14 +66,12 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/chats': typeof ChatsRoute
   '/models': typeof ModelsRoute
   '/prompts': typeof PromptsRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/chats': typeof ChatsRoute
   '/models': typeof ModelsRoute
   '/prompts': typeof PromptsRoute
@@ -95,7 +79,6 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
   '/chats': typeof ChatsRoute
   '/models': typeof ModelsRoute
   '/prompts': typeof PromptsRoute
@@ -103,22 +86,20 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chats' | '/models' | '/prompts'
+  fullPaths: '/chats' | '/models' | '/prompts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chats' | '/models' | '/prompts'
-  id: '__root__' | '/' | '/chats' | '/models' | '/prompts'
+  to: '/chats' | '/models' | '/prompts'
+  id: '__root__' | '/chats' | '/models' | '/prompts'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   ChatsRoute: typeof ChatsRoute
   ModelsRoute: typeof ModelsRoute
   PromptsRoute: typeof PromptsRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   ChatsRoute: ChatsRoute,
   ModelsRoute: ModelsRoute,
   PromptsRoute: PromptsRoute,
@@ -134,14 +115,10 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
         "/chats",
         "/models",
         "/prompts"
       ]
-    },
-    "/": {
-      "filePath": "index.tsx"
     },
     "/chats": {
       "filePath": "chats.tsx"
