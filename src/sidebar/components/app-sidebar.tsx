@@ -1,48 +1,41 @@
-import * as React from "react"
-import {
-  MessageSquare,
-  FileText,
-  Bot
-} from "lucide-react"
+import { MessageSquare, FileText, Bot } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
-import { NavMain } from "@/sidebar/components/nav-main"
+import { NavMain } from '@/sidebar/components/nav-main'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import BottomControl from "./BottomControl"
+} from '@/components/ui/sidebar'
+import BottomControl from './BottomControl'
 
-// This is sample data.
-const data = {
-  navMain: [
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { t } = useTranslation()
+  const navMainItems = [
     {
-      title: "Chats",
-      url: "/chats",
+      title: t('Chat'),
+      url: '/chats',
       icon: MessageSquare,
-      isActive: true,
     },
     {
-      title: "Models",
-      url: "/models",
+      title: t('Models'),
+      url: '/models',
       icon: Bot,
     },
     {
-      title: "Prompts",
-      url: "/prompts",
+      title: t('Prompts'),
+      url: '/prompts',
       icon: FileText,
     },
-  ],
-}
+  ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader></SidebarHeader>
       <SidebarContent>
-      <NavMain items={data.navMain} />
+        <NavMain items={navMainItems} />
       </SidebarContent>
       <SidebarFooter>
         <BottomControl />
