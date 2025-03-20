@@ -1,5 +1,6 @@
 import { type LucideIcon } from 'lucide-react'
 import {
+  SidebarGroup,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -17,16 +18,24 @@ export function NavMain({
 }) {
   return (
     <SidebarMenu>
-      {items.map((item) => (
-        <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild isActive={item.isActive}>
+      <SidebarGroup>
+        {items.map((item) => (
+          <SidebarMenuItem key={item.title}>
             <Link to={item.url}>
-              <item.icon />
-              <span>{item.title}</span>
+              {({ isActive }) => {
+                return (
+                  <SidebarMenuButton asChild isActive={isActive}>
+                    <div>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </div>
+                  </SidebarMenuButton>
+                )
+              }}
             </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+          </SidebarMenuItem>
+        ))}
+      </SidebarGroup>
     </SidebarMenu>
   )
 }

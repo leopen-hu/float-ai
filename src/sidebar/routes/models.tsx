@@ -23,7 +23,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Pencil, Trash2, Copy } from 'lucide-react'
+import { Pencil, Trash2, Copy, PlusIcon } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -33,6 +33,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { modelService } from '@/workjs/services/modelService'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/models')({
   component: Models,
@@ -192,12 +194,89 @@ function Models() {
   }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">{t('Models')}</h2>
-        <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-          {t('Add Model')}
-        </Button>
+    <div className="flex flex-col h-full bg-background">
+      <header className="flex h-14 shrink-0 items-center gap-2 border-b">
+        <div className="flex flex-1 items-center gap-1 px-3">
+          <div className="flex flex-row items-center flex-none">
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="mx-2 h-4" />
+          </div>
+          <h1 className="flex-1 text-lg font-semibold">{t('Models')}</h1>
+          <Button
+            className="flex-none h-7 w-7"
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <PlusIcon />
+          </Button>
+          {/* todo: new chat & chat list */}
+        </div>
+      </header>
+
+      <div className="flex flex-col h-full bg-background p-2">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('Name')}</TableHead>
+              <TableHead className="text-right">{t('Actions')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {models
+              .slice(
+                (currentPage - 1) * itemsPerPage,
+                currentPage * itemsPerPage,
+              )
+              .map((model) => (
+                <TableRow key={model.id}>
+                  <TableCell>{model.name}</TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteModel(model.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEditModel(model)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleCopyModel(model)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+        <div
+          className="flex justify-center mt-4 space-x-2"
+          hidden={models.length <= itemsPerPage}
+        >
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            {t('上一页')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage * itemsPerPage >= models.length}
+          >
+            {t('下一页')}
+          </Button>
+        </div>
       </div>
 
       <AlertDialog
@@ -221,66 +300,6 @@ function Models() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t('Name')}</TableHead>
-            <TableHead className="text-right">{t('Actions')}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {models
-            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-            .map((model) => (
-              <TableRow key={model.id}>
-                <TableCell>{model.name}</TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteModel(model.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleEditModel(model)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleCopyModel(model)}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-      <div
-        className="flex justify-center mt-4 space-x-2"
-        hidden={models.length <= itemsPerPage}
-      >
-        <Button
-          variant="outline"
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          {t('上一页')}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage * itemsPerPage >= models.length}
-        >
-          {t('下一页')}
-        </Button>
-      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

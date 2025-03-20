@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Send } from 'lucide-react'
 import { toast } from 'sonner'
 import ModelSelector from '../components/ModelSelector'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/chats')({
   component: Chats,
@@ -48,10 +50,17 @@ function Chats() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="flex-none p-4 border-b">
-        <h1 className="text-xl font-semibold">{t('New Chat')}</h1>
-      </div>
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
+      <header className="flex flex-none h-14 shrink-0 items-center gap-2 border-b">
+        <div className="flex flex-1 items-center gap-1 px-3">
+          <div className="flex flex-row items-center flex-none">
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="mx-2 h-4" />
+          </div>
+          <h1 className="flex-1 text-lg font-semibold">{t('New Chat')}</h1>
+          {/* todo: new chat & chat list */}
+        </div>
+      </header>
       <div className="flex-1 overflow-y-auto">
         <MessageList messages={messages} />
       </div>
