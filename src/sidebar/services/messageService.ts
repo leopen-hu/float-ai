@@ -84,7 +84,7 @@ export class MessageService {
     reasoningContent: string,
     updateMessages: (updater: (prevMessages: Message[]) => Message[]) => void,
   ): void {
-    this.currentStreamMessage += content
+    this.currentStreamMessage = content
     this.currentReasoningContent = reasoningContent
 
     updateMessages((prevMessages) => {

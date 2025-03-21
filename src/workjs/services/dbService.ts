@@ -1,4 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
+import { ChatSession } from './chatService'
 
 interface FloatAIDB extends DBSchema {
   models: {
@@ -8,6 +9,10 @@ interface FloatAIDB extends DBSchema {
   prompts: {
     key: string
     value: Prompt
+  }
+  chats: {
+    key: string
+    value: ChatSession
   }
 }
 
@@ -32,7 +37,7 @@ export interface Prompt {
 class DBService {
   private static instance: DBService
   private dbName = 'float-ai-db'
-  private dbVersion = 2
+  private dbVersion = 3
   private db: Promise<IDBPDatabase<FloatAIDB>> | null = null
 
   private constructor() {
@@ -49,6 +54,9 @@ class DBService {
           }
           if (!db.objectStoreNames.contains('prompts')) {
             db.createObjectStore('prompts', { keyPath: 'id' })
+          }
+          if (!db.objectStoreNames.contains('chats')) {
+            db.createObjectStore('chats', { keyPath: 'id' })
           }
         },
       })

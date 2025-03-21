@@ -2,6 +2,7 @@ import { OpenAI } from 'openai'
 import { modelService } from './modelService'
 import { promptService } from './promptService'
 import { Prompt } from './dbService'
+import { chatService, ChatMessage } from './chatService'
 
 export interface ExtendedDelta extends OpenAI.ChatCompletionChunk.Choice.Delta {
   reasoning_content?: string
@@ -99,21 +100,41 @@ export class ApiService {
         stream: true,
       })
 
-      let reasoningContent = ''
+      let currentReasoningContent = ''
+      let currentContent = ''
 
       for await (const chunk of completion) {
-        const content =
+        const _content =
           (chunk.choices[0]?.delta as ExtendedDelta)?.content || ''
         const reasoning =
           (chunk.choices[0]?.delta as ExtendedDelta)?.reasoning_content || ''
-        reasoningContent += reasoning
+        currentReasoningContent += reasoning
+        currentContent += _content
 
         console.log('content', content)
-        console.log('reasoningContent', reasoningContent)
-        await this.sendStreamMessage(content, reasoningContent, false)
+        console.log('reasoningContent', currentReasoningContent)
+        await this.sendStreamMessage(
+          currentContent,
+          currentReasoningContent,
+          false,
+        )
       }
 
       await this.sendStreamMessage('', '', true)
+
+      // 保存聊天记录
+      const messages: ChatMessage[] = [
+        ...((await this.createCompletionMessage(
+          content,
+          promptId,
+        )) as ChatMessage[]),
+        {
+          role: 'assistant',
+          content: currentContent,
+          reasoning_content: currentReasoningContent,
+        },
+      ]
+      await chatService.saveChatSession(currentModel.modelId, messages)
     } catch (error) {
       console.error('处理聊天消息时出错:', error)
       throw error
@@ -138,6 +159,20 @@ export class ApiService {
       const reasoningContent =
         (completion.choices[0]?.message as ExtendedMessage)
           ?.reasoning_content || ''
+
+      // 保存聊天记录
+      const messages: ChatMessage[] = [
+        ...((await this.createCompletionMessage(
+          content,
+          promptId,
+        )) as ChatMessage[]),
+        {
+          role: 'assistant',
+          content: responseContent,
+          reasoning_content: reasoningContent,
+        },
+      ]
+      await chatService.saveChatSession(modelId, messages)
 
       return { content: responseContent, reasoningContent }
     } catch (error) {
